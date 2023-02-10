@@ -20,8 +20,10 @@ n_clad_in  = 1.49
 n_clad_out = 1.42
 n_exterior = 1.00
 
-critic_ang1 = math.asin( n_clad_in  / n_core     ) #critical angle for core-first clad interface
-critic_ang2 = math.asin( n_clad_out / n_clad_in  ) #critical angle for first to sencond clad interface
+#critical angle for core-first clad interface
+critic_ang1 = math.asin( n_clad_in  / n_core     )
+#critical angle for first to sencond clad interface
+critic_ang2 = math.asin( n_clad_out / n_clad_in  )
 
 nevts = 1000000
 
@@ -29,9 +31,14 @@ loss_i = list()
 clad_i = list()
 n_i    = list()
 
-for ni in np.arange(1.00,1.42,0.01):
+min_n   = 1.00
+max_n   = 1.42
+n_width = 0.01
+
+for ni in np.arange(min_n,max_n,n_width):
     n_exterior = ni
-    critic_ang3 = math.asin( n_exterior / n_clad_out ) #critical angle for second clad to exterior interface
+    #critical angle for second clad to exterior interface
+    critic_ang3 = math.asin( n_exterior / n_clad_out )
 
     core_evt      = 0
     core_clad_evt = 0
@@ -39,7 +46,7 @@ for ni in np.arange(1.00,1.42,0.01):
     loss_evt      = 0
 
 #    if ni == 1.00 or (ni > 1.33 and ni<1.34):
-#        fileName = "Fibre_toy_MC_"+str(ni)+".txt"
+#        fileName = "data/Fibre_toy_MC_"+str(ni)+".txt"
 #        f = open(fileName,"w")
 
 
@@ -52,15 +59,18 @@ for ni in np.arange(1.00,1.42,0.01):
         new_angle1    = 0
         new_angle2    = 0        
 
-        angle = math.pi * random.random() / 2 #light emission angle, wrt surface (0 ~ 90 degree)
+        #light emission angle, wrt surface (0 ~ 90 degree)
+        angle = math.pi * random.random() / 2
 
         if angle < critic_ang1:
-
-            new_angle1 = math.asin( n_core * math.sin(angle) / n_clad_in) #refraction core-to-clad angle
+            #refraction core-to-clad angle
+            new_angle1 = math.asin( n_core * math.sin(angle) / n_clad_in) 
 
             if new_angle1 < critic_ang2:
-
-                new_angle2 = math.asin( n_clad_in * math.sin(new_angle1) / n_clad_out) #refraction clad-to-clad angle
+                #refraction clad-to-clad angle
+                new_angle2 = math.asin(
+                    n_clad_in * math.sin(new_angle1)
+                    / n_clad_out )
 
                 if new_angle2 < critic_ang3:
 
@@ -79,8 +89,14 @@ for ni in np.arange(1.00,1.42,0.01):
             core_evt += 1
             is_core = 1 
             
-        #if ni == 1.00 or (ni > 1.33 and ni<1.34):
-        #    f.write(str(angle*180/PI)+" "+str(new_angle1*180/PI)+" "+str(new_angle2*180/PI)+" "+str(is_core)+" "+str(is_clad_in)+" "+str(is_clad_out)+" "+str(is_loss)+"\n")
+#       if ni == 1.00 or (ni > 1.33 and ni<1.34):
+#            f.write(str(angle*180/PI)+" "
+#                    +str(new_angle1*180/PI)+" "
+#                    +str(is_core)+" "
+#                    +str(new_angle2*180/PI)+" "
+#                    +str(is_clad_in)+" "
+#                    +str(is_clad_out)+" "
+#                    +str(is_loss)+"\n")
     #print("core light intensity",100*core_evt/nevts,"%")
     #print("clad-in light intensity",100*core_clad_evt/nevts,"%")
     #print("clad-out light intensity",100*clad_clad_evt/nevts,"%")
