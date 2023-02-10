@@ -12,20 +12,6 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-PI = math.pi
-
-#SG fibre values
-n_core     = 1.60
-n_clad_in  = 1.49
-n_clad_out = 1.42
-n_exterior = 1.00
-
-#critical angle for core-first clad interface
-critic_ang1 = math.asin( n_clad_in  / n_core     )
-#critical angle for first to sencond clad interface
-critic_ang2 = math.asin( n_clad_out / n_clad_in  )
-
 def propagate_rdm_ligth(n_exterior, save_output = False):
 
     #critical angle for second clad to exterior interface
@@ -95,6 +81,19 @@ def propagate_rdm_ligth(n_exterior, save_output = False):
     print(ni,loss_evt/nevts)
 
 ##### MAIN
+
+PI = math.pi
+
+#SG fibre values
+n_core     = 1.60
+n_clad_in  = 1.49
+n_clad_out = 1.42
+n_exterior = 1.00
+
+#critical angle for core-first clad interface
+critic_ang1 = math.asin( n_clad_in  / n_core     )
+#critical angle for first to sencond clad interface
+critic_ang2 = math.asin( n_clad_out / n_clad_in  )
 
 nevts = 1000000
 
