@@ -12,7 +12,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-def propagate_rdm_ligth(n_exterior, save_output = False):
+def propagate_rdm_ligth(n_exterior, nevt = 1000, save_output = False):
 
     #critical angle for second clad to exterior interface
     critic_ang3 = math.asin( n_exterior / n_clad_out )
@@ -23,7 +23,7 @@ def propagate_rdm_ligth(n_exterior, save_output = False):
     loss_evt      = 0
 
     if save_output:
-        fileName = "data/Fibre_toy_MC_"+str(ni)+".txt"
+        fileName = "data/Fibre_toy_MC_"+str(n_exterior)+".txt"
         f = open(fileName,"w")
 
 
@@ -75,10 +75,41 @@ def propagate_rdm_ligth(n_exterior, save_output = False):
                     +str(is_clad_out)+" "
                     +str(is_loss)+"\n")
             
-    loss_i.append(loss_evt/nevts)
-    clad_i.append(clad_clad_evt/nevts)
-    n_i.append(ni)
-    print(ni,loss_evt/nevts)
+    return core_evt, core_clad_evt, clad_clad_evt, loss_evt            
+            
+def scan_ref_index(events):
+    loss_i = list()
+    clad_i = list()
+    n_i    = list()
+
+    #Scan over a range of external index values
+    #From air up to outer cladding
+    min_n   = 1.00
+    max_n   = n_clad_out
+    n_width = 0.01
+
+    for ni in np.arange(min_n,max_n,n_width):
+
+        core_evt, core_clad_evt, clad_clad_evt, loss_evt \
+            = propagate_rdm_ligth(ni,events)
+
+        #print("core light intensity",100*core_evt/nevts,"%")
+        #print("clad-in light intensity",100*core_clad_evt/nevts,"%")
+        #print("clad-out light intensity",100*clad_clad_evt/nevts,"%")
+        #print("light loss",100*loss_evt/nevts,"%")
+
+        loss_i.append(loss_evt/nevts)
+        clad_i.append(clad_clad_evt/nevts)
+        n_i.append(ni)
+        print(ni,loss_evt/nevts)
+
+    plt.xlabel('external material refractive index')
+    plt.plot(n_i,loss_i,'r-',label='loss')
+    plt.plot(n_i,clad_i,'b-',label='outter clad reflection')
+    plt.ylabel('fraction of light')
+    plt.grid(linestyle='--', linewidth=0.8, alpha=0.5)
+    plt.legend(loc='best')
+    plt.show()    
 
 ##### MAIN
 
@@ -97,31 +128,7 @@ critic_ang2 = math.asin( n_clad_out / n_clad_in  )
 
 nevts = 1000000
 
-loss_i = list()
-clad_i = list()
-n_i    = list()
-
-min_n   = 1.00
-max_n   = 1.42
-n_width = 0.01
-
-for ni in np.arange(min_n,max_n,n_width):
-
-    propagate_rdm_ligth(ni)
-
-    #print("core light intensity",100*core_evt/nevts,"%")
-    #print("clad-in light intensity",100*core_clad_evt/nevts,"%")
-    #print("clad-out light intensity",100*clad_clad_evt/nevts,"%")
-    #print("light loss",100*loss_evt/nevts,"%")
-
-plt.xlabel('external material refractive index')
-plt.plot(n_i,loss_i,'r-',label='loss')
-plt.plot(n_i,clad_i,'b-',label='outter clad reflection')
-plt.ylabel('fraction of light')
-plt.grid(linestyle='--', linewidth=0.8, alpha=0.5)
-plt.legend(loc='best')
-plt.show()
-
+scan_ref_index(nevts)
 
 
 
