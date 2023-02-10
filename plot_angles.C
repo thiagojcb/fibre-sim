@@ -2,8 +2,8 @@
 
 {
   TNtuple t1("t1","","angle:angle2:angle3:isCore:isClad1:isClad2:isLoss");
-  t1.ReadFile("Fibre_toy_MC_1.0.txt");
-  //t1.ReadFile("Fibre_toy_MC_1.33.txt");
+  //t1.ReadFile("data/Fibre_toy_MC_1.0.txt");
+  t1.ReadFile("data/Fibre_toy_MC_1.33.txt");
 
   TH1D *hCore    = new TH1D("hCore"   ,"Core Light",900,0,90);
   TH1D *hCladIn  = new TH1D("hCladIn" ,"Inner Clad Light",900,0,90);
