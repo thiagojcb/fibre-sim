@@ -12,6 +12,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 PI = math.pi
 
 #SG fibre values
@@ -25,18 +26,8 @@ critic_ang1 = math.asin( n_clad_in  / n_core     )
 #critical angle for first to sencond clad interface
 critic_ang2 = math.asin( n_clad_out / n_clad_in  )
 
-nevts = 1000000
+def propagate_rdm_ligth(n_exterior, save_output = False):
 
-loss_i = list()
-clad_i = list()
-n_i    = list()
-
-min_n   = 1.00
-max_n   = 1.42
-n_width = 0.01
-
-for ni in np.arange(min_n,max_n,n_width):
-    n_exterior = ni
     #critical angle for second clad to exterior interface
     critic_ang3 = math.asin( n_exterior / n_clad_out )
 
@@ -45,9 +36,9 @@ for ni in np.arange(min_n,max_n,n_width):
     clad_clad_evt = 0
     loss_evt      = 0
 
-#    if ni == 1.00 or (ni > 1.33 and ni<1.34):
-#        fileName = "data/Fibre_toy_MC_"+str(ni)+".txt"
-#        f = open(fileName,"w")
+    if save_output:
+        fileName = "data/Fibre_toy_MC_"+str(ni)+".txt"
+        f = open(fileName,"w")
 
 
     for i in range(0,nevts):
@@ -87,25 +78,42 @@ for ni in np.arange(min_n,max_n,n_width):
 
         else:
             core_evt += 1
-            is_core = 1 
-            
-#       if ni == 1.00 or (ni > 1.33 and ni<1.34):
-#            f.write(str(angle*180/PI)+" "
-#                    +str(new_angle1*180/PI)+" "
-#                    +str(is_core)+" "
-#                    +str(new_angle2*180/PI)+" "
-#                    +str(is_clad_in)+" "
-#                    +str(is_clad_out)+" "
-#                    +str(is_loss)+"\n")
-    #print("core light intensity",100*core_evt/nevts,"%")
-    #print("clad-in light intensity",100*core_clad_evt/nevts,"%")
-    #print("clad-out light intensity",100*clad_clad_evt/nevts,"%")
-    #print("light loss",100*loss_evt/nevts,"%")
+            is_core = 1
 
+        if save_output:
+            f.write(str(angle*180/PI)+" "
+                    +str(new_angle1*180/PI)+" "
+                    +str(is_core)+" "
+                    +str(new_angle2*180/PI)+" "
+                    +str(is_clad_in)+" "
+                    +str(is_clad_out)+" "
+                    +str(is_loss)+"\n")
+            
     loss_i.append(loss_evt/nevts)
     clad_i.append(clad_clad_evt/nevts)
     n_i.append(ni)
     print(ni,loss_evt/nevts)
+
+##### MAIN
+
+nevts = 1000000
+
+loss_i = list()
+clad_i = list()
+n_i    = list()
+
+min_n   = 1.00
+max_n   = 1.42
+n_width = 0.01
+
+for ni in np.arange(min_n,max_n,n_width):
+
+    propagate_rdm_ligth(ni)
+
+    #print("core light intensity",100*core_evt/nevts,"%")
+    #print("clad-in light intensity",100*core_clad_evt/nevts,"%")
+    #print("clad-out light intensity",100*clad_clad_evt/nevts,"%")
+    #print("light loss",100*loss_evt/nevts,"%")
 
 plt.xlabel('external material refractive index')
 plt.plot(n_i,loss_i,'r-',label='loss')
