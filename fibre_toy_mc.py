@@ -69,8 +69,8 @@ def propagate_rdm_ligth(n_exterior, nevt = 1000, save_output = False):
         if save_output:
             f.write(str(angle*180/PI)+" "
                     +str(new_angle1*180/PI)+" "
-                    +str(is_core)+" "
                     +str(new_angle2*180/PI)+" "
+                    +str(is_core)+" "
                     +str(is_clad_in)+" "
                     +str(is_clad_out)+" "
                     +str(is_loss)+"\n")
@@ -128,7 +128,9 @@ critic_ang2 = math.asin( n_clad_out / n_clad_in  )
 
 nevts = 1000000
 
-scan_ref_index(nevts)
+propagate_rdm_ligth(1.00,nevts,True)
+
+#scan_ref_index(nevts)
 
 
 
