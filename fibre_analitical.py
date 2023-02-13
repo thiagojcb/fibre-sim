@@ -54,7 +54,7 @@ def scan_ref_index(min_n, max_n, width_n):
         n_i.append(ni)
         print(ni,core_eff,core_clad_eff,clad_clad_eff,loss)
 
-    plt.xlabel('Fibre external environment refractive index')
+    plt.xlabel('External environment refractive index')
 #    plt.plot(n_i,loss_i,'r-',label='loss')
     plt.plot(n_i,core_i,'b-',label='core')
     plt.plot(n_i,clad1_i,'g--',label='1st clad')
