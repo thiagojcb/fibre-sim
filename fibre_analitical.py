@@ -69,16 +69,22 @@ def scan_ref_index(min_n, max_n, width_n):
 
     for ni in np.arange(min_n,max_n,width_n):
 
-        core_eff, core_clad_eff, clad_clad_eff \
+        core_s_eff, core_clad_s_eff, clad_clad_s_eff \
             = get_trap_eff_skew(ni)
-        #core_eff, core_clad_eff, clad_clad_eff \
-            #= get_trap_eff(ni)
+        core_m_eff, core_clad_m_eff, clad_clad_m_eff \
+            = get_trap_eff(ni)
+
+        core_eff      = core_m_eff      + core_s_eff
+        core_clad_eff = core_clad_m_eff + core_clad_s_eff
+        clad_clad_eff = clad_clad_m_eff + clad_clad_s_eff
         loss = 1 - clad_clad_eff
+
         loss_i.append(loss*100)
         clad1_i.append(core_clad_eff*100)
         clad2_i.append(clad_clad_eff*100)
         core_i.append(core_eff*100)
         n_i.append(ni)
+
         #print(ni,core_eff,core_clad_eff,clad_clad_eff,loss)
         print(ni,core_clad_eff/core_eff,clad_clad_eff/core_eff,
               clad_clad_eff/core_clad_eff)
@@ -90,7 +96,7 @@ def scan_ref_index(min_n, max_n, width_n):
     plt.plot(n_i,clad2_i,'r-.',label='2nd clad')
     plt.ylabel('Trapping efficiency (%)')
     plt.grid(linestyle='--', linewidth=0.8, alpha=0.5)
-    plt.ylim([0, 20])
+    plt.ylim([0, 40])
     plt.legend(loc='best')    
     plt.show()    
 
