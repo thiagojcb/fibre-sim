@@ -70,7 +70,9 @@ def scan_ref_index(min_n, max_n, width_n):
     for ni in np.arange(min_n,max_n,width_n):
 
         core_eff, core_clad_eff, clad_clad_eff \
-            = get_trap_eff(ni)
+            = get_trap_eff_skew(ni)
+        #core_eff, core_clad_eff, clad_clad_eff \
+            #= get_trap_eff(ni)
         loss = 1 - clad_clad_eff
         loss_i.append(loss*100)
         clad1_i.append(core_clad_eff*100)
