@@ -32,6 +32,31 @@ def get_trap_eff(n_exterior):
     #print(n_exterior,(critic_ang1)*180/PI,(new_angle1)*180/PI,(new_angle2)*180/PI)
     
     return core_eff, core_clad_eff, clad_clad_eff
+
+def get_trap_eff_skew(n_exterior):
+
+    core_eff      = 0
+    core_clad_eff = 0
+    clad_clad_eff = 0    
+
+    #critical angle for second clad to exterior interface
+    critic_ang3 = math.asin( n_exterior / n_clad_out )
+    core_eff = (0.5 * (-math.cos(PI/2 - critic_ang1) + math.cos(0))
+                    * math.cos(PI/2 - critic_ang1))
+
+    #refraction core-to-clad angle of clad-to-clad crictical angle
+    new_angle1 = math.asin( n_clad_in * math.sin(critic_ang2) / n_core)
+    core_clad_eff = (0.5 * (-math.cos(PI/2 - new_angle1) + math.cos(0))
+                         * math.cos(PI/2 - new_angle1))
+
+    #refraction clad-to-clad angle of clad-to-exterior crictical angle
+    new_angle2 = math.asin( n_clad_out * math.sin(critic_ang3) / n_core )    
+    clad_clad_eff = (0.5 * (-math.cos(PI/2 - new_angle2) + math.cos(0))
+                         * math.cos(PI/2 - new_angle2))
+
+    #print(n_exterior,(critic_ang1)*180/PI,(new_angle1)*180/PI,(new_angle2)*180/PI)
+    
+    return core_eff, core_clad_eff, clad_clad_eff
             
 def scan_ref_index(min_n, max_n, width_n):
     loss_i  = list()
