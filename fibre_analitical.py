@@ -52,7 +52,9 @@ def scan_ref_index(min_n, max_n, width_n):
         clad2_i.append(clad_clad_eff*100)
         core_i.append(core_eff*100)
         n_i.append(ni)
-        print(ni,core_eff,core_clad_eff,clad_clad_eff,loss)
+        #print(ni,core_eff,core_clad_eff,clad_clad_eff,loss)
+        print(ni,core_clad_eff/core_eff,clad_clad_eff/core_eff,
+              clad_clad_eff/core_clad_eff)
 
     plt.xlabel('External environment refractive index')
 #    plt.plot(n_i,loss_i,'r-',label='loss')
