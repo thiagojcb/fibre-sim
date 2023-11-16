@@ -1,14 +1,14 @@
 //macro to get a time smeared distributions for CLOUD DAQ
 
 {
-  TFile *fMyFile = new TFile("positron_2MeV.root");
+  TFile *fMyFile = new TFile("electron_2MeV.root");
   TTree *myTree = (TTree*)fMyFile->Get("Hits");
 
   Double_t posZ = 0.;
   Double_t fibre_dt = 2.8; // decay time WLS fibre
   Double_t myEff=100*(0.108*0.4*0.9); // trapping, QE, coupling
   Double_t TTS = 0.4; // fibre transit time spread / m
-  Double_t timeFibre = 6.24; // average time, in ns, for photon to travel 1m of fibre
+  Double_t timeFibre = 6.26; // average time, in ns, for photon to travel 1m of fibre
   Double_t Att_leng = 5.; // fibre attenuation length metres
   Bool_t isPositron = true;
   
@@ -118,6 +118,7 @@
 	      first_hit_f = hitTime;
 	      hitF = Time_ns;
 	      zF = Hit_Z;
+	      //cout<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
 	    }
 	  
 	    //}
@@ -145,6 +146,7 @@
 	      first_hit_b = hitTime;
 	      hitB = Time_ns;
 	      zB = Hit_Z;
+	      //cout<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
 	    }
 	  }
 	}
@@ -152,7 +154,7 @@
     }//hits on a event loop
     Double_t recoPosZ = 2.0*(first_hit_b-first_hit_f)/(first_hit_f+first_hit_b);
     /*
-      cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ<<endl;
+      cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ*100<<endl;
       cout<<"HitF = "<<hitF<<" . HitB = "<<hitB;
       cout<<" zF = "<<zF<<" . zB = "<<zB<<endl;
     */
