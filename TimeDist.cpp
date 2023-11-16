@@ -10,7 +10,8 @@
   Double_t TTS = 0.4; // fibre transit time spread / m
   Double_t timeFibre = 6.24; // average time, in ns, for photon to travel 1m of fibre
   Double_t Att_leng = 5.; // fibre attenuation length metres
-    
+  Bool_t isPositron = true;
+  
   Double_t             fibreX;
   Double_t             fibreY;
   Double_t             Hit_X;
@@ -85,71 +86,79 @@
   
     for (int i = pastEvt; i<nEvt; ++i) {
       myTree->GetEntry(i);
-      Float_t detected = rand1->Rndm(); // choose if this hit makes a signal
-      Float_t side = rand1->Rndm(); // choose if this hit goes to detector's back or front
-      if (side <= 0.5) {
+      Double_t zlim;
+      if(isPositron){
+	zlim = 100;
+      }else{
+	zlim = 1000000;
+      }
+      if(Hit_Z>(zlim*-1.) && Hit_Z<zlim){
+	Float_t detected = rand1->Rndm(); // choose if this hit makes a signal
+	Float_t side = rand1->Rndm(); // choose if this hit goes to detector's back or front
+	if (side <= 0.5) {
 	
-	Double_t distTravel = 2. - posZ  - Hit_Z / 1e3;
-	Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
+	  Double_t distTravel = 2. - posZ  - Hit_Z / 1e3;
+	  Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
 
-	if(detected < totalEff/100.) {
+	  if(detected < totalEff/100.) {
 	  
+	    if(distTravel < -4 || distTravel > 4) {
+	      cout<<distTravel<<" "<< Hit_Z<<endl;
+	    }
+	    Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
+	    Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS; //time spread, flat around average.
+	    Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
+	    hTime_front_0->Fill(Time_ns);
+	    hTime_front_1->Fill(Time_ns + WLStime);
+	    hTime_front_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
+	    hTime_front->Fill(hitTime);
+	    hTime_total->Fill(hitTime);
+
+	    if(hitTime<first_hit_f){
+	      first_hit_f = hitTime;
+	      hitF = Time_ns;
+	      zF = Hit_Z;
+	    }
+	  
+	    //}
+	    //hTime->Fill(hitTime, myEff/100.);
+	  }
+	} else {
+	  Double_t distTravel = 2. + posZ  + Hit_Z / 1e3;
 	  if(distTravel < -4 || distTravel > 4) {
 	    cout<<distTravel<<" "<< Hit_Z<<endl;
 	  }
-	  Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
-	  Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS; //time spread, flat around average.
-	  Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
-	  hTime_front_0->Fill(Time_ns);
-	  hTime_front_1->Fill(Time_ns + WLStime);
-	  hTime_front_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
-	  hTime_front->Fill(hitTime);
-	  hTime_total->Fill(hitTime);
-
-	  if(hitTime<first_hit_f){
-	    first_hit_f = hitTime;
-	    hitF = Time_ns;
-	    zF = Hit_Z;
-	  }
+	  Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
+	  if(detected < totalEff/100.) {
+	    Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
+	    Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS;
+	    Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
+	    hTime_back_0->Fill(Time_ns);
+	    hTime_back_1->Fill(Time_ns + WLStime);
+	    hTime_back_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
+	    hTime_back->Fill(hitTime);
+	    hTime_total->Fill(hitTime);
+	    //}
+	    //hTime->Fill(hitTime, myEff/100.);
 	  
-	  //}
-	  //hTime->Fill(hitTime, myEff/100.);
-	}
-      } else {
-	Double_t distTravel = 2. + posZ  + Hit_Z / 1e3;
-	if(distTravel < -4 || distTravel > 4) {
-	  cout<<distTravel<<" "<< Hit_Z<<endl;
-	}
-	Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
-	if(detected < totalEff/100.) {
-	  Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
-	  Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS;
-	  Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
-	  hTime_back_0->Fill(Time_ns);
-	  hTime_back_1->Fill(Time_ns + WLStime);
-	  hTime_back_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
-	  hTime_back->Fill(hitTime);
-	  hTime_total->Fill(hitTime);
-	  //}
-	  //hTime->Fill(hitTime, myEff/100.);
-	  
-	  if(hitTime<first_hit_b){
-	    first_hit_b = hitTime;
-	    hitB = Time_ns;
-	    zB = Hit_Z;
+	    if(hitTime<first_hit_b){
+	      first_hit_b = hitTime;
+	      hitB = Time_ns;
+	      zB = Hit_Z;
+	    }
 	  }
 	}
       }
     }//hits on a event loop
     Double_t recoPosZ = 2.0*(first_hit_b-first_hit_f)/(first_hit_f+first_hit_b);
     /*
-    cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ<<endl;
-    cout<<"HitF = "<<hitF<<" . HitB = "<<hitB;
-    cout<<" zF = "<<zF<<" . zB = "<<zB<<endl;
+      cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ<<endl;
+      cout<<"HitF = "<<hitF<<" . HitB = "<<hitB;
+      cout<<" zF = "<<zF<<" . zB = "<<zB<<endl;
     */
     hRecoZ->Fill(100*(posZ - recoPosZ));
   }//rndm loop
-
+  
   hTime_front->SetStats(kFALSE);
   hTime_front_0->SetStats(kFALSE);
   hTime_back->SetStats(kFALSE);
