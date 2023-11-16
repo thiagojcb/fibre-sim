@@ -4,12 +4,10 @@
   TFile *fMyFile = new TFile("positron_2MeV.root");
   TTree *myTree = (TTree*)fMyFile->Get("Hits");
 
-  Double_t posZ = 1.5;
-  //Double_t posZ = 0.;
+  Double_t posZ = 0.;
   Double_t fibre_dt = 2.8; // decay time WLS fibre
-  Double_t myEff=100*(0.108*0.4*0.9);
-  //Double_t myEff=100.;
-  Double_t TTS = 0.4;
+  Double_t myEff=100*(0.108*0.4*0.9); // trapping, QE, coupling
+  Double_t TTS = 0.4; // fibre transit time spread / m
   Double_t timeFibre = 6.24; // average time, in ns, for photon to travel 1m of fibre
   Double_t Att_leng = 5.; // fibre attenuation length metres
     
@@ -35,7 +33,7 @@
   TH1D *hTime_back_0  = new TH1D("hTb0","Scint. Time + Rndm. Walk",501,-0.5,501.5);
   TH1D *hTime_back_1  = new TH1D("hTb1","+ WLS",501,-0.5,501.5);
   TH1D *hTime_back_2  = new TH1D("hTb2","+ Transity Time",501,-0.5,501.5);
-  TH1D *hTime_total = new TH1D("hTtotal","Total",501,-0.5,501.5);  
+  TH1D *hTime_total = new TH1D("hTtotal","Total",501,-0.5,501.5);
 
   hTime_front->GetYaxis()->SetTitle("Entries / 1 ns");
   hTime_front->GetXaxis()->SetTitle("Hit time (ns)");
@@ -57,25 +55,44 @@
   hTime_total->SetLineWidth(2);
   hTime_total->SetLineColor(kBlack);
 
+  TH1D *hRecoZ = new TH1D("hRecoZ","Reco Z resolution",100,-20,20);
+  hRecoZ->GetXaxis()->SetTitle("True Z - Reco Z (cm)");
+  hRecoZ->GetYaxis()->SetTitle("Entries");
+  
   Int_t mySeed = 0;
   TRandom3 *rand1 = new TRandom3(mySeed);
   
-
   Int_t nEvt=0, iEvt=0;
   Int_t pastEvt = nEvt;
   nEvt += myTree->GetEntries(Form("Event_Number==%i",iEvt));
 
-  for (int i = pastEvt; i<nEvt; ++i) {
-    myTree->GetEntry(i);
-    Float_t detected = rand1->Rndm(); // choose if this hit makes a signal
+  Int_t trials = 1000;
+  Double_t first_hit_f, first_hit_b;
+  
+  for (int j=0; j<trials; ++j){ //randomization loop, for same event
+    hTime_front_0->Reset();
+    hTime_front_1->Reset();
+    hTime_front_2->Reset();
+    hTime_front->Reset();
+    hTime_total->Reset();
+    hTime_back_0->Reset();
+    hTime_back_1->Reset();
+    hTime_back_2->Reset();
+    hTime_back->Reset();
+    first_hit_f = 100;
+    first_hit_b = 100;
+  
+    for (int i = pastEvt; i<nEvt; ++i) {
+      myTree->GetEntry(i);
+      Float_t detected = rand1->Rndm(); // choose if this hit makes a signal
       Float_t side = rand1->Rndm(); // choose if this hit goes to detector's back or front
       if (side <= 0.5) {
-
+	
 	Double_t distTravel = 2. - posZ  - Hit_Z / 1e3;
 	Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
 
 	if(detected < totalEff/100.) {
-
+	  
 	  if(distTravel < -4 || distTravel > 4) {
 	    cout<<distTravel<<" "<< Hit_Z<<endl;
 	  }
@@ -87,6 +104,9 @@
 	  hTime_front_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
 	  hTime_front->Fill(hitTime);
 	  hTime_total->Fill(hitTime);
+
+	  if(hitTime<first_hit_f)
+	    first_hit_f = hitTime;
 	  //}
 	  //hTime->Fill(hitTime, myEff/100.);
 	}
@@ -107,9 +127,16 @@
 	  hTime_total->Fill(hitTime);
 	  //}
 	  //hTime->Fill(hitTime, myEff/100.);
+	  
+	  if(hitTime<first_hit_b)
+	    first_hit_b = hitTime;
 	}
       }
-  }
+    }//hits on a event loop
+    Double_t recoPosZ = 2.0*(first_hit_b-first_hit_f)/(first_hit_f+first_hit_b);
+    //cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ<<endl;
+    hRecoZ->Fill(100*(posZ - recoPosZ));
+  }//rndm loop
 
   hTime_front->SetStats(kFALSE);
   hTime_front_0->SetStats(kFALSE);
@@ -140,6 +167,7 @@
   //hTime_front_0->SetTitle(Form("%2.0fm fibre",2. - posZ));
   hTime_front->SetTitle(Form("Hit time distribution for 2 MeV positron at Z = %2.1fm",posZ));
 
+  hRecoZ->Draw();
   
     /// debug
   /*
