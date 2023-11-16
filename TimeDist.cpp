@@ -59,7 +59,7 @@
   hRecoZ->GetXaxis()->SetTitle("True Z - Reco Z (cm)");
   hRecoZ->GetYaxis()->SetTitle("Entries");
   
-  Int_t mySeed = 0;
+  Int_t mySeed = 2;
   TRandom3 *rand1 = new TRandom3(mySeed);
   
   Int_t nEvt=0, iEvt=0;
@@ -68,6 +68,8 @@
 
   Int_t trials = 1000;
   Double_t first_hit_f, first_hit_b;
+
+  TGraph *gBF = new TGraph();
   
   for (int j=0; j<trials; ++j){ //randomization loop, for same event
     hTime_front_0->Reset();
@@ -148,8 +150,9 @@
     /*
       cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ*100<<endl;
       cout<<"HitF = "<<hitF<<" . HitB = "<<hitB;
-      cout<<" zF = "<<zF<<" . zB = "<<zB<<endl;
+      cout<<" zF = "<<zF<<" . zB = "<<zB<<endl<<endl;
     */
+    gBF->AddPoint(zF,zB);
     hRecoZ->Fill(100*(posZ - recoPosZ));
   }//rndm loop
   
