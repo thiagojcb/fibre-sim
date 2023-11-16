@@ -12,8 +12,7 @@
   Double_t TTS = 0.4;
   Double_t timeFibre = 6.24; // average time, in ns, for photon to travel 1m of fibre
   Double_t Att_leng = 5.; // fibre attenuation length metres
-  
-  
+    
   Double_t             fibreX;
   Double_t             fibreY;
   Double_t             Hit_X;
@@ -139,8 +138,7 @@
   hTime_back->SetTitle(Form("Back Channels (%2.1fm away)", 2.0+posZ));
   gPad->BuildLegend(0.491404,0.555789,0.893983,0.890526);
   //hTime_front_0->SetTitle(Form("%2.0fm fibre",2. - posZ));
-  hTime_front->SetTitle(Form("Hit time distribution 2MeV positron at Z = %2.1fm",posZ));  
-
+  hTime_front->SetTitle(Form("Hit time distribution for 2 MeV positron at Z = %2.1fm",posZ));
 
   
     /// debug
