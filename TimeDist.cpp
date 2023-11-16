@@ -81,6 +81,7 @@
     hTime_back->Reset();
     first_hit_f = 100;
     first_hit_b = 100;
+    Double_t hitF, hitB, zF, zB;
   
     for (int i = pastEvt; i<nEvt; ++i) {
       myTree->GetEntry(i);
@@ -105,8 +106,12 @@
 	  hTime_front->Fill(hitTime);
 	  hTime_total->Fill(hitTime);
 
-	  if(hitTime<first_hit_f)
+	  if(hitTime<first_hit_f){
 	    first_hit_f = hitTime;
+	    hitF = Time_ns;
+	    zF = Hit_Z;
+	  }
+	  
 	  //}
 	  //hTime->Fill(hitTime, myEff/100.);
 	}
@@ -128,13 +133,20 @@
 	  //}
 	  //hTime->Fill(hitTime, myEff/100.);
 	  
-	  if(hitTime<first_hit_b)
+	  if(hitTime<first_hit_b){
 	    first_hit_b = hitTime;
+	    hitB = Time_ns;
+	    zB = Hit_Z;
+	  }
 	}
       }
     }//hits on a event loop
     Double_t recoPosZ = 2.0*(first_hit_b-first_hit_f)/(first_hit_f+first_hit_b);
-    //cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ<<endl;
+    /*
+    cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ<<endl;
+    cout<<"HitF = "<<hitF<<" . HitB = "<<hitB;
+    cout<<" zF = "<<zF<<" . zB = "<<zB<<endl;
+    */
     hRecoZ->Fill(100*(posZ - recoPosZ));
   }//rndm loop
 
