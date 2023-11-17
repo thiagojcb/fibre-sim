@@ -118,7 +118,7 @@
 	    first_hit_f = hitTime;
 	    hitF = Time_ns;
 	    zF = Hit_Z;
-	    //cout<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
+	    //cout<<"Front: "<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
 	  }
 	  
 	  //}
@@ -146,12 +146,12 @@
 	    first_hit_b = hitTime;
 	    hitB = Time_ns;
 	    zB = Hit_Z;
-	    //cout<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
+	    //cout<<"Back: "<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
 	  }
 	}
       }
     }//hits on a event loop
-    Double_t recoPosZ = 2.0*(first_hit_b-first_hit_f)/(first_hit_f+first_hit_b);
+    Double_t recoPosZ = (first_hit_b-first_hit_f)/(2*timeFibre);
     /*
       cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ*100<<endl;
       cout<<"HitF = "<<hitF<<" . HitB = "<<hitB;
