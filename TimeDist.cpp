@@ -63,7 +63,7 @@
   Int_t mySeed = 2;
   TRandom3 *rand1 = new TRandom3(mySeed);
   
-  Int_t nEvt=0, iEvt=2, pastEvt=0;
+  Int_t nEvt=0, iEvt=0, pastEvt=0;
   for(int i=0;i<=iEvt;++i){
     pastEvt=nEvt;
     nEvt += myTree->GetEntries(Form("Event_Number==%i",i));
@@ -157,8 +157,8 @@
       cout<<"HitF = "<<hitF<<" . HitB = "<<hitB;
       cout<<" zF = "<<zF<<" . zB = "<<zB<<endl<<endl;
     */
-    gBF->AddPoint(zF,zB);
-    //gBF->AddPoint(hTime_total->Integral(),100*(recoPosZ - posZ));
+    //gBF->AddPoint(zF,zB);
+    gBF->AddPoint(hTime_total->Integral(),100*(recoPosZ - posZ));
     hRecoZ->Fill(100*(recoPosZ - posZ));
   }//rndm loop
   
@@ -172,26 +172,28 @@
   
   hTime_front->Draw();
   hTime_front->GetYaxis()->SetRangeUser(0.1,maxCount*1.1);
-  //hTime_front_0->Draw();
-  //hTime_front_1->Draw("same");
-  //hTime_front_2->Draw("same");
+
   hTime_back->Draw("same");
   //hTime_total->Draw("same");
-  //hTime_back_0->Draw("same");
-  //hTime_front_0->GetXaxis()->SetRangeUser(0,80);
   hTime_front->GetXaxis()->SetRangeUser(0,100);
-
-  //gPad->SetLogy();
-  //gPad->BuildLegend(39.2097,1.78702,80.0083,3.10247);
-
 
   hTime_front->SetTitle(Form("Front Channels (%2.1fm away)", 2.0-posZ));
   hTime_back->SetTitle(Form("Back Channels (%2.1fm away)", 2.0+posZ));
   gPad->BuildLegend(0.491404,0.555789,0.893983,0.890526);
-  //hTime_front_0->SetTitle(Form("%2.0fm fibre",2. - posZ));
-  hTime_front->SetTitle(Form("Hit time distribution for 2 MeV positron at Z = %2.1fm",posZ));
-
+    hTime_front->SetTitle(Form("Hit time distribution for 2 MeV electron at Z = %2.1fm",posZ));
+    
+  new TCanvas();
   hRecoZ->Draw();
+
+  new TCanvas();
+  hTime_front_0->Draw();
+  hTime_front_1->Draw("same");
+  hTime_front_2->Draw("same");
+  //hTime_back_0->Draw("same");
+  hTime_front_0->GetXaxis()->SetRangeUser(0,80);
+  gPad->SetLogy();
+  gPad->BuildLegend(39.2097,1.78702,80.0083,3.10247);
+  hTime_front_0->SetTitle(Form("%2.0fm fibre",2. - posZ));
   
     /// debug
   /*
