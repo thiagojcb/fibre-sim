@@ -63,9 +63,13 @@
   Int_t mySeed = 2;
   TRandom3 *rand1 = new TRandom3(mySeed);
   
-  Int_t nEvt=0, iEvt=0;
-  Int_t pastEvt = nEvt;
-  nEvt += myTree->GetEntries(Form("Event_Number==%i",iEvt));
+  Int_t nEvt=0, iEvt=2, pastEvt=0;
+  for(int i=0;i<=iEvt;++i){
+    pastEvt=nEvt;
+    nEvt += myTree->GetEntries(Form("Event_Number==%i",i));
+    //cout<<i<<" "<<pastEvt<<" "<<nEvt<<endl;
+  }
+
 
   Int_t trials = 1000;
   Double_t first_hit_f, first_hit_b;
