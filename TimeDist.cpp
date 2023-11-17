@@ -184,10 +184,14 @@
   hTime_back->SetTitle(Form("Back Channels (%2.1fm away)", 2.0+posZ));
   gPad->BuildLegend(0.491404,0.555789,0.893983,0.890526);
   hTime_front->SetTitle(Form("Hit time distribution for 2 MeV electron at Z = %2.1fm",posZ));
-    
+  gPad->SetGridx();
+  gPad->SetGridy();
+  
   new TCanvas();
   hRecoZ->Draw();
-
+  gPad->SetGridx();
+  gPad->SetGridy();
+  
   new TCanvas();
   hTime_front_0->Draw();
   hTime_front_1->Draw("same");
@@ -196,7 +200,7 @@
   gPad->SetLogy();
   hTime_front_0->GetXaxis()->SetRangeUser(0,80);
   gPad->BuildLegend(0.6689,0.7094,0.9971,0.995);
-  hTime_front_0->SetTitle(Form("%2.0fm fibre",2. - posZ));
+  hTime_front_0->SetTitle(Form("%2.1fm fibre",2. - posZ));
   
     /// debug
   /*
