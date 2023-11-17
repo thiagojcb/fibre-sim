@@ -158,6 +158,7 @@
       cout<<" zF = "<<zF<<" . zB = "<<zB<<endl<<endl;
     */
     gBF->AddPoint(zF,zB);
+    //gBF->AddPoint(hTime_total->Integral(),100*(recoPosZ - posZ));
     hRecoZ->Fill(100*(recoPosZ - posZ));
   }//rndm loop
   
