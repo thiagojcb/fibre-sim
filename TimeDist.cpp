@@ -57,7 +57,7 @@
   hTime_total->SetLineColor(kBlack);
 
   TH1D *hRecoZ = new TH1D("hRecoZ","Reco Z resolution",100,-20,20);
-  hRecoZ->GetXaxis()->SetTitle("True Z - Reco Z (cm)");
+  hRecoZ->GetXaxis()->SetTitle("Reco Z - True Z (cm)");
   hRecoZ->GetYaxis()->SetTitle("Entries");
   
   Int_t mySeed = 2;
@@ -158,7 +158,7 @@
       cout<<" zF = "<<zF<<" . zB = "<<zB<<endl<<endl;
     */
     gBF->AddPoint(zF,zB);
-    hRecoZ->Fill(100*(posZ - recoPosZ));
+    hRecoZ->Fill(100*(recoPosZ - posZ));
   }//rndm loop
   
   hTime_front->SetStats(kFALSE);
