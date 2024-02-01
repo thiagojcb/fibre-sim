@@ -5,7 +5,7 @@
   TTree *myTree = (TTree*)fMyFile->Get("Hits");
 
   Double_t posZ = 0.;
-  Double_t fibre_dt = 2.8; // decay time WLS fibre
+  Double_t fibre_dt = 2.; // decay time WLS fibre
   Double_t myEff=100*(0.108*0.4*0.9); // trapping, QE, coupling
   //Double_t myEff=100;
   Double_t TTS = 0.4; // fibre transit time spread / m
