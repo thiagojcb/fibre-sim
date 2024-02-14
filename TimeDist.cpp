@@ -4,7 +4,7 @@
   TFile *fMyFile = new TFile("electron_2MeV.root");
   TTree *myTree = (TTree*)fMyFile->Get("Hits");
 
-  Double_t posZ = 0.;
+  Double_t posZ = 1.89;
   Double_t fibre_dt = 2.; // decay time WLS fibre
   Double_t myEff=100*(0.108*0.4*0.9); // trapping, QE, coupling
   //Double_t myEff=100;
@@ -31,6 +31,8 @@
   TH1D *hTime_back_2  = new TH1D("hTb2","+ Transity Time",501,-0.5,501.5);
   TH1D *hTime_total = new TH1D("hTtotal","Total",501,-0.5,501.5);
 
+  TH1D *hTime_Max_bin_cont = new TH1D("hTime_Max_bin_cont","",101,-0.5,100.5);
+  
   hTime_front->GetYaxis()->SetTitle("Entries / 1 ns");
   hTime_front->GetXaxis()->SetTitle("Hit time (ns)");
   hTime_front->SetLineWidth(4); hTime_front->SetFillColor(kBlue+2); hTime_front->SetFillStyle(3005);
@@ -58,7 +60,7 @@
   hRecoZ->GetXaxis()->SetTitle("Reco Z - True Z (cm)");
   hRecoZ->GetYaxis()->SetTitle("Entries");
   
-  Int_t mySeed = 2;
+  Int_t mySeed = 0;
   TRandom3 *rand1 = new TRandom3(mySeed);
   
   Int_t nEvt=0, iEvt=2, pastEvt=0;
@@ -152,6 +154,9 @@
     //gBF->AddPoint(zF,zB);
     gBF->AddPoint(hTime_total->Integral(),100*(recoPosZ - posZ));
     hRecoZ->Fill(100*(recoPosZ - posZ)); //in cm
+
+    hTime_Max_bin_cont->Fill(hTime_front->GetMaximum());
+    
   }//rndm loop
 
   /// plotting
@@ -205,6 +210,9 @@
   hRatio->Draw();
   */
 
+  new TCanvas;
+  hTime_Max_bin_cont->Draw();
+  
   gPad->SetGridx();
   gPad->SetGridy();
 }
