@@ -13,10 +13,13 @@
   Double_t Att_leng = 5.; // fibre attenuation length metres
   
   Double_t Hit_Z, Time_ns; // branches from Susie G4 output
-  myTree->SetBranchAddress("Hit_Z"  , &Hit_Z);
-  myTree->SetBranchAddress("Time_ns", &Time_ns);
+  Int_t    fibreNumber;
+  myTree->SetBranchAddress("Hit_Z"      , &Hit_Z);
+  myTree->SetBranchAddress("Time_ns"    , &Time_ns);
+  myTree->SetBranchAddress("fibreNumber", &fibreNumber);
 
-  map<int, vector<pair<double, double>>> groupedFibers;
+  map<int, vector<double>> channelHits_front;
+  map<int, vector<double>> channelHits_back;
   
   TH1D *hTime_front = new TH1D("hTft","Front electronics",501,-0.5,501.5);  
   TH1D *hTime_front_0 = new TH1D("hTf0","Scint. Time + Rndm. Walk",501,-0.5,501.5);  
@@ -102,13 +105,15 @@
 	        cout<<distTravel<<" "<< Hit_Z<<endl;
           }
           Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
-	      Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS; //time spread, flat around average.
+	  Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS; //time spread, flat around average.
           Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre; //total time, since G4 t0
     	  hTime_front_0->Fill(Time_ns);
           hTime_front_1->Fill(Time_ns + WLStime);
     	  hTime_front_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
           hTime_front->Fill(hitTime);
     	  hTime_total->Fill(hitTime);
+	  //cout<<fibreNumber<<endl;
+	  channelHits_front[fibreNumber].push_back(hitTime);
 
 	  if(hitTime<first_hit_f){
 	    first_hit_f = hitTime;
@@ -132,6 +137,8 @@
 	  hTime_back_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
 	  hTime_back->Fill(hitTime);
 	  hTime_total->Fill(hitTime);
+
+	  channelHits_back[fibreNumber].push_back(hitTime);
 	  
 	  if(hitTime<first_hit_b){
 	    first_hit_b = hitTime;
