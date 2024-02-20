@@ -19,6 +19,8 @@
   myTree->SetBranchAddress("fibreNumber", &fibreNumber);
 
   map<int, vector<double>> channelHits_front;
+  TH1D *hTime_front_map = new TH1D("hTfm","hits in map",501,-0.5,501.5);  
+
   map<int, vector<double>> channelHits_back;
   
   TH1D *hTime_front = new TH1D("hTft","Front electronics",501,-0.5,501.5);  
@@ -63,7 +65,7 @@
   Int_t mySeed = 0;
   TRandom3 *rand1 = new TRandom3(mySeed);
   
-  Int_t nEvt=0, iEvt=2, pastEvt=0;
+  Int_t nEvt=0, iEvt=1, pastEvt=0;
   for(int i=0;i<=iEvt;++i){
     pastEvt=nEvt;
     nEvt += myTree->GetEntries(Form("Event_Number==%i",i));
@@ -178,7 +180,7 @@
 
   hTime_back->Draw("same");
   //hTime_total->Draw("same");
-  hTime_front->GetXaxis()->SetRangeUser(0,100);
+  //hTime_front->GetXaxis()->SetRangeUser(0,100);
 
   hTime_front->SetTitle(Form("Front Channels (%2.1fm away)", 2.0-posZ));
   hTime_back->SetTitle(Form("Back Channels (%2.1fm away)", 2.0+posZ));
@@ -219,4 +221,17 @@
   
   gPad->SetGridx();
   gPad->SetGridy();
+
+  new TCanvas;
+  for (const auto& [key, value] : channelHits_front){
+    cout<<key<<" : ";
+    for (const auto& n : value){
+      hTime_front_map->Fill(n);
+      cout<<n<<" ";
+    }
+    cout<<endl;
+  }
+  hTime_front_map->Draw();
+  hTime_front->Draw("same");  
+
 }
