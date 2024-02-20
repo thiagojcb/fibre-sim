@@ -12,15 +12,14 @@
   Double_t timeFibre = 6.26; // average time, in ns, for photon to travel 1m of fibre
   Double_t Att_leng = 5.; // fibre attenuation length metres
   
-  Double_t fibreX, fibreY, Hit_X, Hit_Y, Hit_Z, Time_ns; // branches from Susie G4 output
-  
-  myTree->SetBranchAddress("fibreX" , &fibreX);
-  myTree->SetBranchAddress("fibreY" , &fibreY);
+  Double_t Hit_X, Hit_Y, Hit_Z, Time_ns; // branches from Susie G4 output
   myTree->SetBranchAddress("Hit_X"  , &Hit_X);
   myTree->SetBranchAddress("Hit_Y"  , &Hit_Y);
   myTree->SetBranchAddress("Hit_Z"  , &Hit_Z);
   myTree->SetBranchAddress("Time_ns", &Time_ns);
 
+  map<int, vector<pair<double, double>>> groupedFibers;
+  
   TH1D *hTime_front = new TH1D("hTft","Front electronics",501,-0.5,501.5);  
   TH1D *hTime_front_0 = new TH1D("hTf0","Scint. Time + Rndm. Walk",501,-0.5,501.5);  
   TH1D *hTime_front_1 = new TH1D("hTf1","+ WLS",501,-0.5,501.5);  
