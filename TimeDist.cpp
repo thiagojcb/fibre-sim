@@ -12,9 +12,7 @@
   Double_t timeFibre = 6.26; // average time, in ns, for photon to travel 1m of fibre
   Double_t Att_leng = 5.; // fibre attenuation length metres
   
-  Double_t Hit_X, Hit_Y, Hit_Z, Time_ns; // branches from Susie G4 output
-  myTree->SetBranchAddress("Hit_X"  , &Hit_X);
-  myTree->SetBranchAddress("Hit_Y"  , &Hit_Y);
+  Double_t Hit_Z, Time_ns; // branches from Susie G4 output
   myTree->SetBranchAddress("Hit_Z"  , &Hit_Z);
   myTree->SetBranchAddress("Time_ns", &Time_ns);
 
