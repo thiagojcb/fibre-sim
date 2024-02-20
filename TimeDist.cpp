@@ -70,7 +70,7 @@
     //cout<<i<<" "<<pastEvt<<" "<<nEvt<<endl;
   }
 
-  Int_t trials = 1000;
+  Int_t trials = 1;
   Double_t first_hit_f, first_hit_b;
 
   TGraph *gBF = new TGraph();
@@ -113,35 +113,35 @@
           hTime_front->Fill(hitTime);
     	  hTime_total->Fill(hitTime);
 
-	      if(hitTime<first_hit_f){
-	        first_hit_f = hitTime;
-	        hitF = Time_ns;
-	        zF = Hit_Z;
-	        //cout<<"Front: "<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
+	  if(hitTime<first_hit_f){
+	    first_hit_f = hitTime;
+	    hitF = Time_ns;
+	    zF = Hit_Z;
+	    //cout<<"Front: "<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
           }
     	}
       } else {
-	    Double_t distTravel = 2. + posZ  + Hit_Z / 1e3;
-	    if(distTravel < -4 || distTravel > 4) {
-	        cout<<distTravel<<" "<< Hit_Z<<endl;
-	    }
-	    Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
-	    if(detected < totalEff/100.) {
-    	    Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
-	        Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS;
-	        Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
-	        hTime_back_0->Fill(Time_ns);
-	        hTime_back_1->Fill(Time_ns + WLStime);
-	        hTime_back_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
-	        hTime_back->Fill(hitTime);
-	        hTime_total->Fill(hitTime);
-
-            if(hitTime<first_hit_b){
-	            first_hit_b = hitTime;
-	            hitB = Time_ns;
-	            zB = Hit_Z;
-	            //cout<<"Back: "<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
-	        }
+	Double_t distTravel = 2. + posZ  + Hit_Z / 1e3;
+	if(distTravel < -4 || distTravel > 4) {
+	  cout<<distTravel<<" "<< Hit_Z<<endl;
+	}
+	Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
+	if(detected < totalEff/100.) {
+	  Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
+	  Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS;
+	  Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
+	  hTime_back_0->Fill(Time_ns);
+	  hTime_back_1->Fill(Time_ns + WLStime);
+	  hTime_back_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
+	  hTime_back->Fill(hitTime);
+	  hTime_total->Fill(hitTime);
+	  
+	  if(hitTime<first_hit_b){
+	    first_hit_b = hitTime;
+	    hitB = Time_ns;
+	    zB = Hit_Z;
+	    //cout<<"Back: "<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
+	  }
         }
       }
     }//hits on a event loop
