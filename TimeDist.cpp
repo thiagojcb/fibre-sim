@@ -244,11 +244,25 @@
     hTime_front_map[i] = new TH1D(Form("hTfm%d",key),Form("Fibre %d, front ch",key),160,0,100);
     hTime_front_map[i]->GetXaxis()->SetTitle("Hit time (ns)");
     hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
+
     for (const auto& n : value){
       hTime_front_map[i]->Fill(n);
-      Int_t iBin = xaxis->FindBin(n);
+      Int_t    iBin    = xaxis->FindBin(n);
+      Double_t binW    = hTime_front_map[i]->GetBinWidth(iBin);
+      Double_t iCenter = hTime_front_map[i]->GetBinCenter(iBin);
+      Double_t tDif    = n - iCenter;
+      Double_t t0      = tDif;
+      if(tDif>0){
+	iBin++; //start from the next bin, since this one will have 0 volts
+	t0 = binW - tDif; //conpensate for the shift
+      }else{
+	t0 = t0*(-1.0); //otherwise will get region where no pulse info
+      }
+      
       for(int j=iBin; j<160;++j){
-	Double_t voltage = channelWF[i]->GetBinContent(j) + spline->Eval(1e-9 +(j-iBin)*0.625*1e-9); // need to review this! not sure if correct
+	Double_t pulse_i = spline->Eval(1e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9);
+	
+	Double_t voltage = channelWF[i]->GetBinContent(j) + pulse_i;
 	channelWF[i]->SetBinContent(j,voltage);
       }
       cout<<n<<" ";
