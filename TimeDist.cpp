@@ -6,7 +6,7 @@
 
   Double_t posZ = 1.89;
   Double_t fibre_dt = 2.; // decay time WLS fibre
-  Double_t myEff=100*(0.108*0.4*0.9); // trapping, QE, coupling
+  Double_t myEff=2*100*(0.108*0.4*0.9); // trapping, QE, coupling
   //Double_t myEff=100;
   Double_t TTS = 0.4; // fibre transit time spread / m
   Double_t timeFibre = 6.26; // average time, in ns, for photon to travel 1m of fibre
@@ -19,8 +19,6 @@
   myTree->SetBranchAddress("fibreNumber", &fibreNumber);
 
   map<int, vector<double>> channelHits_front;
-  TH1D *hTime_front_map = new TH1D("hTfm","hits in map",501,-0.5,501.5);  
-
   map<int, vector<double>> channelHits_back;
   
   TH1D *hTime_front = new TH1D("hTft","Front electronics",501,-0.5,501.5);  
@@ -230,17 +228,40 @@
   
   gPad->SetGridx();
   gPad->SetGridy();
-
-  new TCanvas;
+  
+  TH1F** channelWF = new TH1F*[channelHits_front.size()];
+  TH1D** hTime_front_map = new TH1D*[channelHits_front.size()];
+  Int_t i=1;
+  
   for (const auto& [key, value] : channelHits_front){
-    cout<<key<<" : ";
+    cout<<i<<" : "<<key<<" : ";
+    channelWF[i] = new TH1F(Form("h%d",key),Form("Fibre %d, front ch",key),160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
+    channelWF[i]->GetXaxis()->SetTitle("tick time (ns)");
+    channelWF[i]->GetYaxis()->SetTitle("Voltage (V)");
+    hTime_front_map[i] = new TH1D(Form("hTfm%d",key),Form("Fibre %d, front ch",key),160,0,100);
+    hTime_front_map[i]->GetXaxis()->SetTitle("Hit time (ns)");
+    hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
     for (const auto& n : value){
-      hTime_front_map->Fill(n);
+      hTime_front_map[i]->Fill(n);
+      TAxis *xaxis = channelWF[i]->GetXaxis();
+      Int_t iBin = xaxis->FindBin(n);
+      for(int j=iBin; j<gWF->GetN();++j){
+	Double_t voltage = channelWF[i]->GetBinContent(j) + spline->Eval(1e-9 +(j-iBin)*0.625*1e-9);
+	channelWF[i]->SetBinContent(j,voltage);
+      }
       cout<<n<<" ";
     }
     cout<<endl;
+    ++i;
   }
-  hTime_front_map->Draw();
-  hTime_front->Draw("same");  
+  TCanvas* c2 = new TCanvas;
+  c2->Divide(2,1);
+  c2->cd(1);
+  hTime_front_map[17]->Draw();
+  c2->cd(2);
+  channelWF[17]->Draw();
+
+  //hTime_front_map->Draw();
+  //hTime_front->Draw("same");  
 
 }
