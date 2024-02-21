@@ -76,6 +76,14 @@
   Double_t first_hit_f, first_hit_b;
 
   TGraph *gBF = new TGraph();
+
+  TNtuple t1("t1","","time:volt");
+  t1.ReadFile("SPE_WF.txt");
+  t1.Draw("volt:time","","*");
+  auto gWF = (TGraph*)gPad->GetPrimitive("Graph");
+  TSpline3 *spline = new TSpline3("spline", gWF);
+  spline->SetLineColor(kRed);
+  spline->Draw("csame");
   
   for (int j=0; j<trials; ++j){ //randomization loop, for same event
     hTime_front_0->Reset();
@@ -174,7 +182,8 @@
   Double_t maxCount = hTime_front->GetMaximum();
   if(hTime_back->GetMaximum() > maxCount)
     maxCount = hTime_back->GetMaximum();
-  
+
+  new TCanvas();
   hTime_front->Draw();
   hTime_front->GetYaxis()->SetRangeUser(0.1,maxCount*1.1);
 
