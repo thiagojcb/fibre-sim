@@ -232,6 +232,9 @@
   TH1F** channelWF = new TH1F*[channelHits_front.size()];
   TH1D** hTime_front_map = new TH1D*[channelHits_front.size()];
   Int_t i=1;
+
+  TH1F* channelWF_ref = new TH1F("channelWF_ref","channelWF_ref",160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
+  TAxis *xaxis = channelWF_ref->GetXaxis();
   
   for (const auto& [key, value] : channelHits_front){
     cout<<i<<" : "<<key<<" : ";
@@ -243,10 +246,9 @@
     hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
     for (const auto& n : value){
       hTime_front_map[i]->Fill(n);
-      TAxis *xaxis = channelWF[i]->GetXaxis();
       Int_t iBin = xaxis->FindBin(n);
-      for(int j=iBin; j<gWF->GetN();++j){
-	Double_t voltage = channelWF[i]->GetBinContent(j) + spline->Eval(1e-9 +(j-iBin)*0.625*1e-9);
+      for(int j=iBin; j<160;++j){
+	Double_t voltage = channelWF[i]->GetBinContent(j) + spline->Eval(1e-9 +(j-iBin)*0.625*1e-9); // need to review this! not sure if correct
 	channelWF[i]->SetBinContent(j,voltage);
       }
       cout<<n<<" ";
