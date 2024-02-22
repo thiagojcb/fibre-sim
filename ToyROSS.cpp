@@ -3,6 +3,12 @@
 //output: hit distribution on µSiC and its waveform
 //assumptions on efficiencies (trapping, QE, coupling), time to travel down the fibre, attenuation lenght
 
+//currently, this macro does several things. Probably better to split them...
+//1-Get the hit time distributions
+//2-Reconstruct Z position
+//3-Get distributions of contents of the 1ns bin with most entries
+//4-Get channel wise waveforms
+
 {
   // Input constants
   Double_t posZ      = 1.89;                        // translation from centre (z=0)
@@ -10,7 +16,7 @@
   Double_t TTS       = 0.4;                         // fibre transit time spread / m
   Double_t timeFibre = 6.26;                        // average time, in ns, for photon to travel 1m of fibre
   Double_t Att_leng  = 5.;                          // fibre attenuation length, in metres
-  Double_t factor    = 2.;                          // factor to boost or decrease LY of Susie sim
+  Double_t factor    = 3.41;                        // factor to boost or decrease LY of Susie sim
   Double_t myEff     = 100*(factor*0.108*0.4*0.9);  // trapping, QE, coupling
 
   // loading input file
