@@ -1,17 +1,21 @@
-//macro to get a time smeared distributions for CLOUD DAQ
+//script of a toy readout of CLOUD
+//input: Susie simulations. Time of hits on fibre
+//output: hit distribution on µSiC and its waveform
+//assumptions on efficiencies (trapping, QE, coupling), time to travel down the fibre, attenuation lenght
 
 {
+  // Input constants
+  Double_t posZ      = 1.89;                        // translation from centre (z=0)
+  Double_t fibre_dt  = 2.;                          // decay time WLS fibre
+  Double_t TTS       = 0.4;                         // fibre transit time spread / m
+  Double_t timeFibre = 6.26;                        // average time, in ns, for photon to travel 1m of fibre
+  Double_t Att_leng  = 5.;                          // fibre attenuation length, in metres
+  Double_t factor    = 2.;                          // factor to boost or decrease LY of Susie sim
+  Double_t myEff     = 100*(factor*0.108*0.4*0.9);  // trapping, QE, coupling
+
+  // loading input file
   TFile *fMyFile = new TFile("electron_2MeV.root");
   TTree *myTree = (TTree*)fMyFile->Get("Hits");
-
-  Double_t posZ = 1.89;
-  Double_t fibre_dt = 2.; // decay time WLS fibre
-  Double_t myEff=2*100*(0.108*0.4*0.9); // trapping, QE, coupling
-  //Double_t myEff=100;
-  Double_t TTS = 0.4; // fibre transit time spread / m
-  Double_t timeFibre = 6.26; // average time, in ns, for photon to travel 1m of fibre
-  Double_t Att_leng = 5.; // fibre attenuation length metres
-  
   Double_t Hit_Z, Time_ns; // branches from Susie G4 output
   Int_t    fibreNumber;
   myTree->SetBranchAddress("Hit_Z"      , &Hit_Z);
