@@ -236,6 +236,9 @@
 
   TH1F* channelWF_ref = new TH1F("channelWF_ref","channelWF_ref",160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
   TAxis *xaxis = channelWF_ref->GetXaxis();
+
+  Int_t maxChC = 0;
+  Int_t maxCh  = 0;
   
   for (const auto& [key, value] : channelHits_front){
     cout<<i<<" : "<<key<<" : ";
@@ -246,6 +249,11 @@
     hTime_front_map[i]->GetXaxis()->SetTitle("Hit time (ns)");
     hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
 
+    if(maxChC<value.size()){
+      maxChC = value.size();
+      maxCh = i;
+    }
+    
     for (const auto& n : value){
       hTime_front_map[i]->Fill(n);
       Int_t    iBin    = xaxis->FindBin(n);
@@ -275,9 +283,9 @@
   TCanvas* c2 = new TCanvas;
   c2->Divide(2,1);
   c2->cd(1);
-  hTime_front_map[17]->Draw();
+  hTime_front_map[maxCh]->Draw();
   c2->cd(2);
-  channelWF[17]->Draw();
+  channelWF[maxCh]->Draw();
 
   //hTime_front_map->Draw();
   //hTime_front->Draw("same");  
