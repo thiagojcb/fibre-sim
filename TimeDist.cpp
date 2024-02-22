@@ -76,7 +76,8 @@
   TGraph *gBF = new TGraph();
 
   TNtuple t1("t1","","time:volt");
-  t1.ReadFile("SPE_WF.txt");
+  //t1.ReadFile("SPE_WF.txt"); //positive pulse 
+  t1.ReadFile("ampSim.txt"); //negative pulse
   t1.Draw("volt:time","","*");
   auto gWF = (TGraph*)gPad->GetPrimitive("Graph");
   TSpline3 *spline = new TSpline3("spline", gWF);
@@ -260,7 +261,8 @@
       }
       
       for(int j=iBin; j<160;++j){
-	Double_t pulse_i = spline->Eval(1e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9);
+	//Double_t pulse_i = spline->Eval(1e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //positive pulse starts at 1ns
+	Double_t pulse_i = spline->Eval(10e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //negative pulse starts at 10ns
 	
 	Double_t voltage = channelWF[i]->GetBinContent(j) + pulse_i;
 	channelWF[i]->SetBinContent(j,voltage);
