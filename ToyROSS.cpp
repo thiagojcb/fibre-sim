@@ -107,7 +107,6 @@ void ToyROSS(){
   
   for (int j=0; j<trials; ++j){ //randomization loop, for same event
       reset();
-    Double_t hitF, hitB, zF, zB;
 
     for (int i = pastEvt; i<nEvt; ++i) {
       myTree->GetEntry(i);
@@ -136,10 +135,7 @@ void ToyROSS(){
 	  channelHits_front[fibreNumber].push_back(hitTime);
 
 	  if(hitTime<first_hit_f){
-	    first_hit_f = hitTime;
-	    hitF = Time_ns;
-	    zF = Hit_Z;
-	    //cout<<"Front: "<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
+    	    first_hit_f = hitTime;
           }
     	}
       } else {
@@ -161,21 +157,12 @@ void ToyROSS(){
 	  channelHits_back[fibreNumber].push_back(hitTime);
 	  
 	  if(hitTime<first_hit_b){
-	    first_hit_b = hitTime;
-	    hitB = Time_ns;
-	    zB = Hit_Z;
-	    //cout<<"Back: "<<Hit_Z<<" "<<Time_ns<<" "<<WLStime<<" "<<spreadT<<" "<<distTravel<<" "<<hitTime<<endl;
-	  }
+    	    first_hit_b = hitTime;
+	      }
         }
       }
     }//hits on a event loop
     Double_t recoPosZ = (first_hit_b-first_hit_f)/(2*timeFibre);
-    /*
-      cout<<"Trial "<<j<<" , Front: "<<first_hit_f<<" , Back: "<<first_hit_b<<" , recoZ = "<<recoPosZ*100<<endl;
-      cout<<"HitF = "<<hitF<<" . HitB = "<<hitB;
-      cout<<" zF = "<<zF<<" . zB = "<<zB<<endl<<endl;
-    */
-    //gBF->AddPoint(zF,zB);
     gBF->AddPoint(hTime_total->Integral(),100*(recoPosZ - posZ));
     hRecoZ->Fill(100*(recoPosZ - posZ)); //in cm
 
