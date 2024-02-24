@@ -11,68 +11,65 @@
 
 #include "ToyROSS.h"
 
+void beautify(){
+
+    hTime_front->GetYaxis()->SetTitle("Entries / 1 ns");
+    hTime_front->GetXaxis()->SetTitle("Hit time (ns)");
+    hTime_front->SetLineWidth(4); hTime_front->SetFillColor(kBlue+2); hTime_front->SetFillStyle(3005);
+    hTime_back->SetLineWidth(4);
+    hTime_back->SetLineColor(kRed+2);  hTime_back->SetMarkerColor(kRed+2);
+    hTime_back->SetFillColor(kRed+2); hTime_back->SetFillStyle(3004);
+
+    hTime_front_0->GetYaxis()->SetTitle("Entries / 1 ns");
+    hTime_front_0->GetXaxis()->SetTitle("Hit time (ns)");
+    hTime_front_0->SetLineWidth(4);
+    hTime_front_0->SetLineWidth(4); hTime_front_0->SetFillColor(kBlue+2); hTime_front_0->SetFillStyle(3005);
+    hTime_front_1->SetLineWidth(4);
+    hTime_front_2->SetLineWidth(4);
+    hTime_back_0->SetLineWidth(4);
+    hTime_front_1->SetLineColor(kRed+2);   hTime_front_1->SetMarkerColor(kRed+2);
+    hTime_front_1->SetFillStyle(3004);   hTime_front_1->SetFillColor(kRed+2);
+    hTime_front_2->SetLineColor(kViolet+2);   hTime_front_2->SetMarkerColor(kViolet+2);
+    hTime_front_2->SetFillStyle(3003);   hTime_front_2->SetFillColor(kViolet+2);
+    hTime_back_0->SetLineColor(kRed+2);   hTime_back_0->SetMarkerColor(kRed+2);
+
+    hTime_total->SetLineWidth(2);
+    hTime_total->SetLineColor(kBlack);
+
+    hRecoZ->GetXaxis()->SetTitle("Reco Z - True Z (cm)");
+    hRecoZ->GetYaxis()->SetTitle("Entries");
+
+}
+
+void initialize(){
+    // loading input file
+    fMyFile = new TFile("electron_2MeV.root");
+    myTree = (TTree*)fMyFile->Get("Hits");
+    myTree->SetBranchAddress("Hit_Z"      , &Hit_Z);
+    myTree->SetBranchAddress("Time_ns"    , &Time_ns);
+    myTree->SetBranchAddress("fibreNumber", &fibreNumber);
+
+    hTime_front = new TH1D("hTft","Front electronics",501,-0.5,501.5);
+    hTime_front_0 = new TH1D("hTf0","Scint. Time + Rndm. Walk",501,-0.5,501.5);
+    hTime_front_1 = new TH1D("hTf1","+ WLS",501,-0.5,501.5);
+    hTime_front_2 = new TH1D("hTf2","+ Ttransit Time",501,-0.5,501.5);
+    hTime_back  = new TH1D("hTb","Back electronics",501,-0.5,501.5);
+    hTime_back_0  = new TH1D("hTb0","Scint. Time + Rndm. Walk",501,-0.5,501.5);
+    hTime_back_1  = new TH1D("hTb1","+ WLS",501,-0.5,501.5);
+    hTime_back_2  = new TH1D("hTb2","+ Transity Time",501,-0.5,501.5);
+    hTime_total = new TH1D("hTtotal","Total",501,-0.5,501.5);
+
+    hTime_Max_bin_cont = new TH1D("hTime_Max_bin_cont","",101,-0.5,100.5);
+
+    hRecoZ = new TH1D("hRecoZ","Reco Z resolution",100,-20,20);
+
+}
+
 void ToyROSS(){
-  // Input constants
-//  Double_t posZ      = 1.89;                        // translation from centre (z=0)
-//  Double_t fibre_dt  = 2.;                          // decay time WLS fibre
-//  Double_t TTS       = 0.4;                         // fibre transit time spread / m
-//  Double_t timeFibre = 6.26;                        // average time, in ns, for photon to travel 1m of fibre
-//  Double_t Att_leng  = 5.;                          // fibre attenuation length, in metres
-//  Double_t factor    = 3.41;                        // factor to boost or decrease LY of Susie sim
- // Double_t myEff     = 100*(factor*0.108*0.4*0.9);  // trapping, QE, coupling
-                                                    // with all these numbers + Susie 2 MeV electron file: 400 PE/MeV
 
-  // loading input file
-  TFile *fMyFile = new TFile("electron_2MeV.root");
-  TTree *myTree = (TTree*)fMyFile->Get("Hits");
-  Double_t Hit_Z, Time_ns; // branches from Susie G4 output
-  Int_t    fibreNumber;
-  myTree->SetBranchAddress("Hit_Z"      , &Hit_Z);
-  myTree->SetBranchAddress("Time_ns"    , &Time_ns);
-  myTree->SetBranchAddress("fibreNumber", &fibreNumber);
+    initialize();
+    beautify();
 
-  map<int, vector<double>> channelHits_front;
-  map<int, vector<double>> channelHits_back;
-  
-  TH1D *hTime_front = new TH1D("hTft","Front electronics",501,-0.5,501.5);  
-  TH1D *hTime_front_0 = new TH1D("hTf0","Scint. Time + Rndm. Walk",501,-0.5,501.5);  
-  TH1D *hTime_front_1 = new TH1D("hTf1","+ WLS",501,-0.5,501.5);  
-  TH1D *hTime_front_2 = new TH1D("hTf2","+ Ttransit Time",501,-0.5,501.5);  
-  TH1D *hTime_back  = new TH1D("hTb","Back electronics",501,-0.5,501.5);
-  TH1D *hTime_back_0  = new TH1D("hTb0","Scint. Time + Rndm. Walk",501,-0.5,501.5);
-  TH1D *hTime_back_1  = new TH1D("hTb1","+ WLS",501,-0.5,501.5);
-  TH1D *hTime_back_2  = new TH1D("hTb2","+ Transity Time",501,-0.5,501.5);
-  TH1D *hTime_total = new TH1D("hTtotal","Total",501,-0.5,501.5);
-
-  TH1D *hTime_Max_bin_cont = new TH1D("hTime_Max_bin_cont","",101,-0.5,100.5);
-  
-  hTime_front->GetYaxis()->SetTitle("Entries / 1 ns");
-  hTime_front->GetXaxis()->SetTitle("Hit time (ns)");
-  hTime_front->SetLineWidth(4); hTime_front->SetFillColor(kBlue+2); hTime_front->SetFillStyle(3005);
-  hTime_back->SetLineWidth(4);
-  hTime_back->SetLineColor(kRed+2);  hTime_back->SetMarkerColor(kRed+2);
-  hTime_back->SetFillColor(kRed+2); hTime_back->SetFillStyle(3004);
-
-  hTime_front_0->GetYaxis()->SetTitle("Entries / 1 ns");
-  hTime_front_0->GetXaxis()->SetTitle("Hit time (ns)");
-  hTime_front_0->SetLineWidth(4);
-  hTime_front_0->SetLineWidth(4); hTime_front_0->SetFillColor(kBlue+2); hTime_front_0->SetFillStyle(3005);
-  hTime_front_1->SetLineWidth(4);
-  hTime_front_2->SetLineWidth(4);
-  hTime_back_0->SetLineWidth(4);
-  hTime_front_1->SetLineColor(kRed+2);   hTime_front_1->SetMarkerColor(kRed+2);
-  hTime_front_1->SetFillStyle(3004);   hTime_front_1->SetFillColor(kRed+2);
-  hTime_front_2->SetLineColor(kViolet+2);   hTime_front_2->SetMarkerColor(kViolet+2);
-  hTime_front_2->SetFillStyle(3003);   hTime_front_2->SetFillColor(kViolet+2);
-  hTime_back_0->SetLineColor(kRed+2);   hTime_back_0->SetMarkerColor(kRed+2);
-
-  hTime_total->SetLineWidth(2);
-  hTime_total->SetLineColor(kBlack);
-
-  TH1D *hRecoZ = new TH1D("hRecoZ","Reco Z resolution",100,-20,20);
-  hRecoZ->GetXaxis()->SetTitle("Reco Z - True Z (cm)");
-  hRecoZ->GetYaxis()->SetTitle("Entries");
-  
   Int_t mySeed = 0;
   TRandom3 *rand1 = new TRandom3(mySeed);
   
