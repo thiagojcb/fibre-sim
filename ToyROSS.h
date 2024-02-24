@@ -36,3 +36,11 @@ TH1D *hTime_Max_bin_cont;
 TH1D *hRecoZ;
 Double_t first_hit_f, first_hit_b;
 TGraph *gBF;
+
+TSpline3 *spline;
+
+TH1F** channelWF;
+TH1D** hTime_front_map;
+
+TH1F* channelWF_ref;
+TAxis *xaxis;
