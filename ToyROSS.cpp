@@ -39,6 +39,8 @@ void beautify(){
     hRecoZ->GetXaxis()->SetTitle("Reco Z - True Z (cm)");
     hRecoZ->GetYaxis()->SetTitle("Entries");
 
+    hMaxAmp->GetXaxis()->SetTitle("Max amplitude (V)");
+    hMaxAmp->GetYaxis()->SetTitle("Entries / 0.1 V");
 }
 
 void initialize(){
@@ -71,6 +73,8 @@ void initialize(){
     xaxis = channelWF_ref->GetXaxis();
 
     cWF = new TCanvas;
+
+    hMaxAmp = new TH1D("hMaxAmp","",100,-1,0);
 }
 
 void reset(){
@@ -242,7 +246,7 @@ void ToyROSS(){
     Int_t i=1;
 
     for (const auto& [key, value] : channelHits_front){
-        cout<<i<<" : "<<key<<" : ";
+        //cout<<i<<" : "<<key<<" : ";
         channelWF[i] = new TH1F(Form("h%d",key),Form("Fibre %d, front ch",key),160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
         channelWF[i]->GetXaxis()->SetTitle("tick time (ns)");
         channelWF[i]->GetYaxis()->SetTitle("Voltage (V)");
@@ -275,20 +279,23 @@ void ToyROSS(){
                 Double_t voltage = channelWF[i]->GetBinContent(j) + pulse_i;
                 channelWF[i]->SetBinContent(j,voltage);
             }
-            cout<<n<<" ";
+            //cout<<n<<" ";
           }
-          cout<<endl;
+          //cout<<endl;
           Double_t amp = channelWF[i]->GetMinimum();
           if(amp<maxAmp)
               maxAmp = amp; //negative pulse
           ++i;
       }
-    cout<<"Max amp = "<<maxAmp<<endl;
+    hMaxAmp->Fill(maxAmp);
 
   }//rndm loop
+  cout<<"Max amp = "<<hMaxAmp->GetMean()<<" for "<< gBF->GetMean() <<"PE."<<endl;
 
   /// plotting
-  plotFrenzy();
-  gimmeWF(maxCh);
+  //plotFrenzy();
+  new TCanvas();
+  hMaxAmp->Draw();
+  //gimmeWF(maxCh);
 
 }
