@@ -124,44 +124,45 @@ void ToyROSS(){
 	        cout<<distTravel<<" "<< Hit_Z<<endl;
           }
           Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
-	  Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS; //time spread, flat around average.
+    	  Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS; //time spread, flat around average.
           Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre; //total time, since G4 t0
     	  hTime_front_0->Fill(Time_ns);
           hTime_front_1->Fill(Time_ns + WLStime);
     	  hTime_front_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
           hTime_front->Fill(hitTime);
     	  hTime_total->Fill(hitTime);
-	  //cout<<fibreNumber<<endl;
-	  channelHits_front[fibreNumber].push_back(hitTime);
+    	  //cout<<fibreNumber<<endl;
+	      channelHits_front[fibreNumber].push_back(hitTime);
 
-	  if(hitTime<first_hit_f){
+    	  if(hitTime<first_hit_f){
     	    first_hit_f = hitTime;
           }
     	}
       } else {
-	Double_t distTravel = 2. + posZ  + Hit_Z / 1e3;
-	if(distTravel < -4 || distTravel > 4) {
-	  cout<<distTravel<<" "<< Hit_Z<<endl;
-	}
-	Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
-	if(detected < totalEff/100.) {
-	  Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
-	  Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS;
-	  Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
-	  hTime_back_0->Fill(Time_ns);
-	  hTime_back_1->Fill(Time_ns + WLStime);
-	  hTime_back_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
-	  hTime_back->Fill(hitTime);
-	  hTime_total->Fill(hitTime);
+	    Double_t distTravel = 2. + posZ  + Hit_Z / 1e3;
+	    if(distTravel < -4 || distTravel > 4) {
+	        cout<<distTravel<<" "<< Hit_Z<<endl;
+	    }
+	    Double_t totalEff = myEff * TMath::Exp(- distTravel / Att_leng);
+	    if(detected < totalEff/100.) {
+            Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
+    	    Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS;
+	        Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
+	        hTime_back_0->Fill(Time_ns);
+            hTime_back_1->Fill(Time_ns + WLStime);
+            hTime_back_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
+    	    hTime_back->Fill(hitTime);
+	        hTime_total->Fill(hitTime);
 
-	  channelHits_back[fibreNumber].push_back(hitTime);
+	        channelHits_back[fibreNumber].push_back(hitTime);
 	  
-	  if(hitTime<first_hit_b){
-    	    first_hit_b = hitTime;
-	      }
+    	    if(hitTime<first_hit_b){
+    	        first_hit_b = hitTime;
+	        }
         }
       }
     }//hits on a event loop
+
     Double_t recoPosZ = (first_hit_b-first_hit_f)/(2*timeFibre);
     gBF->AddPoint(hTime_total->Integral(),100*(recoPosZ - posZ));
     hRecoZ->Fill(100*(recoPosZ - posZ)); //in cm
@@ -209,18 +210,6 @@ void ToyROSS(){
   hTime_front_0->GetXaxis()->SetRangeUser(0,80);
   gPad->BuildLegend(0.6689,0.7094,0.9971,0.995);
   hTime_front_0->SetTitle(Form("%2.1fm fibre",2. - posZ));
-  
-    /// debug
-  /*
-  TH1D *hRatio = (TH1D*)hTime_front->Clone();
-  hRatio->Sumw2();
-  hTime_back->Sumw2();
-  hRatio->Divide(hTime_back);
-  hRatio->GetXaxis()->SetRangeUser(0,31);
-  new TCanvas;
-  hRatio->SetLineWidth(3);
-  hRatio->Draw();
-  */
 
   new TCanvas;
   hTime_Max_bin_cont->Draw();
