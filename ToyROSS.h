@@ -1,4 +1,9 @@
 // Input constants
+
+Int_t     trials = 1000;
+Int_t     mySeed = 0;
+TRandom3 *rand1;
+
 Double_t posZ      = 1.89;                        // translation from centre (z=0)
 Double_t fibre_dt  = 2.;                          // decay time WLS fibre
 Double_t TTS       = 0.4;                         // fibre transit time spread / m
@@ -16,7 +21,6 @@ Int_t    fibreNumber;
 map<int, vector<double>> channelHits_front;
 map<int, vector<double>> channelHits_back;
 
-
 TH1D *hTime_front;
 TH1D *hTime_front_0;
 TH1D *hTime_front_1;
@@ -30,3 +34,5 @@ TH1D *hTime_total;
 TH1D *hTime_Max_bin_cont;
 
 TH1D *hRecoZ;
+Double_t first_hit_f, first_hit_b;
+TGraph *gBF;

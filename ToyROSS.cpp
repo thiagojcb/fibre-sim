@@ -63,38 +63,12 @@ void initialize(){
 
     hRecoZ = new TH1D("hRecoZ","Reco Z resolution",100,-20,20);
 
+    rand1 = new TRandom3(mySeed);
+
+    gBF = new TGraph();
 }
 
-void ToyROSS(){
-
-    initialize();
-    beautify();
-
-  Int_t mySeed = 0;
-  TRandom3 *rand1 = new TRandom3(mySeed);
-  
-  Int_t nEvt=0, iEvt=1, pastEvt=0;
-  for(int i=0;i<=iEvt;++i){
-    pastEvt=nEvt;
-    nEvt += myTree->GetEntries(Form("Event_Number==%i",i));
-    //cout<<i<<" "<<pastEvt<<" "<<nEvt<<endl;
-  }
-
-  Int_t trials = 1000;
-  Double_t first_hit_f, first_hit_b;
-
-  TGraph *gBF = new TGraph();
-
-  TNtuple t1("t1","","time:volt");
-  //t1.ReadFile("SPE_WF.txt"); //positive pulse 
-  t1.ReadFile("ampSim.txt"); //negative pulse
-  t1.Draw("volt:time","","*");
-  auto gWF = (TGraph*)gPad->GetPrimitive("Graph");
-  TSpline3 *spline = new TSpline3("spline", gWF);
-  spline->SetLineColor(kRed);
-  spline->Draw("csame");
-  
-  for (int j=0; j<trials; ++j){ //randomization loop, for same event
+void reset(){
     hTime_front_0->Reset();
     hTime_front_1->Reset();
     hTime_front_2->Reset();
@@ -106,9 +80,34 @@ void ToyROSS(){
     hTime_back->Reset();
     first_hit_f = 100;
     first_hit_b = 100;
-    Double_t hitF, hitB, zF, zB;
     channelHits_front.clear();
     channelHits_back.clear();
+}
+
+void ToyROSS(){
+
+    initialize();
+    beautify();
+  
+  Int_t nEvt=0, iEvt=1, pastEvt=0;
+  for(int i=0;i<=iEvt;++i){
+    pastEvt=nEvt;
+    nEvt += myTree->GetEntries(Form("Event_Number==%i",i));
+    //cout<<i<<" "<<pastEvt<<" "<<nEvt<<endl;
+  }
+
+  TNtuple t1("t1","","time:volt");
+  //t1.ReadFile("SPE_WF.txt"); //positive pulse 
+  t1.ReadFile("ampSim.txt"); //negative pulse
+  t1.Draw("volt:time","","*");
+  auto gWF = (TGraph*)gPad->GetPrimitive("Graph");
+  TSpline3 *spline = new TSpline3("spline", gWF);
+  spline->SetLineColor(kRed);
+  spline->Draw("csame");
+  
+  for (int j=0; j<trials; ++j){ //randomization loop, for same event
+      reset();
+    Double_t hitF, hitB, zF, zB;
 
     for (int i = pastEvt; i<nEvt; ++i) {
       myTree->GetEntry(i);
