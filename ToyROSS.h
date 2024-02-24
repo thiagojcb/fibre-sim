@@ -1,6 +1,6 @@
 // Input constants
 
-Int_t     trials = 1000;
+Int_t     trials = 1;
 Int_t     mySeed = 0;
 TRandom3 *rand1;
 
@@ -46,3 +46,7 @@ TH1F* channelWF_ref;
 TAxis *xaxis;
 
 TCanvas* cWF;
+
+Double_t maxAmp;
+Int_t maxChC = 0;
+Int_t maxCh  = 0;
