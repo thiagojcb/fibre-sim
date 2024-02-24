@@ -44,3 +44,5 @@ TH1D** hTime_front_map;
 
 TH1F* channelWF_ref;
 TAxis *xaxis;
+
+TCanvas* cWF;

@@ -69,6 +69,8 @@ void initialize(){
 
     channelWF_ref = new TH1F("channelWF_ref","channelWF_ref",160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
     xaxis = channelWF_ref->GetXaxis();
+
+    cWF = new TCanvas;
 }
 
 void reset(){
@@ -85,6 +87,15 @@ void reset(){
     first_hit_b = 100;
     channelHits_front.clear();
     channelHits_back.clear();
+}
+
+void gimmeWF(Int_t chid){
+    cWF = new TCanvas;
+    cWF->Divide(2,1);
+    cWF->cd(1);
+    hTime_front_map[chid]->Draw();
+    cWF->cd(2);
+    channelWF[chid]->Draw();
 }
 
 void plotFrenzy(){
@@ -131,61 +142,6 @@ void plotFrenzy(){
 
     gPad->SetGridx();
     gPad->SetGridy();
-
-    channelWF = new TH1F*[channelHits_front.size()];
-    hTime_front_map = new TH1D*[channelHits_front.size()];
-    Int_t i=1;
-
-    Int_t maxChC = 0;
-    Int_t maxCh  = 0;
-
-    for (const auto& [key, value] : channelHits_front){
-        cout<<i<<" : "<<key<<" : ";
-        channelWF[i] = new TH1F(Form("h%d",key),Form("Fibre %d, front ch",key),160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
-        channelWF[i]->GetXaxis()->SetTitle("tick time (ns)");
-        channelWF[i]->GetYaxis()->SetTitle("Voltage (V)");
-        hTime_front_map[i] = new TH1D(Form("hTfm%d",key),Form("Fibre %d, front ch",key),160,0,100);
-        hTime_front_map[i]->GetXaxis()->SetTitle("Hit time (ns)");
-        hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
-
-        if(maxChC<value.size()){
-            maxChC = value.size();
-            maxCh = i;
-        }
-
-        for (const auto& n : value){
-            hTime_front_map[i]->Fill(n);
-            Int_t    iBin    = xaxis->FindBin(n);
-            Double_t binW    = hTime_front_map[i]->GetBinWidth(iBin);
-            Double_t iCenter = hTime_front_map[i]->GetBinCenter(iBin);
-            Double_t tDif    = n - iCenter;
-            Double_t t0      = tDif;
-            if(tDif>0){
-                iBin++; //start from the next bin, since this one will have 0 volts
-                t0 = binW - tDif; //conpensate for the shift
-            }else{
-                t0 = t0*(-1.0); //otherwise will get region where no pulse info
-            }
-
-            for(int j=iBin; j<160;++j){
-                //Double_t pulse_i = spline->Eval(1e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //positive pulse starts at 1ns
-                Double_t pulse_i = spline->Eval(10e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //negative pulse starts at 10ns
-
-                Double_t voltage = channelWF[i]->GetBinContent(j) + pulse_i;
-                channelWF[i]->SetBinContent(j,voltage);
-            }
-            cout<<n<<" ";
-        }
-        cout<<endl;
-        ++i;
-    }
-
-    TCanvas* c2 = new TCanvas;
-    c2->Divide(2,1);
-    c2->cd(1);
-    hTime_front_map[maxCh]->Draw();
-    c2->cd(2);
-    channelWF[maxCh]->Draw();
 
     //hTime_front_map->Draw();
     //hTime_front->Draw("same");
@@ -278,7 +234,55 @@ void ToyROSS(){
     
   }//rndm loop
 
+  channelWF = new TH1F*[channelHits_front.size()];
+  hTime_front_map = new TH1D*[channelHits_front.size()];
+  Int_t i=1;
+
+  Int_t maxChC = 0;
+  Int_t maxCh  = 0;
+
+  for (const auto& [key, value] : channelHits_front){
+      cout<<i<<" : "<<key<<" : ";
+      channelWF[i] = new TH1F(Form("h%d",key),Form("Fibre %d, front ch",key),160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
+      channelWF[i]->GetXaxis()->SetTitle("tick time (ns)");
+      channelWF[i]->GetYaxis()->SetTitle("Voltage (V)");
+      hTime_front_map[i] = new TH1D(Form("hTfm%d",key),Form("Fibre %d, front ch",key),160,0,100);
+      hTime_front_map[i]->GetXaxis()->SetTitle("Hit time (ns)");
+      hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
+
+      if(maxChC<value.size()){
+          maxChC = value.size();
+          maxCh = i;
+      }
+
+      for (const auto& n : value){
+          hTime_front_map[i]->Fill(n);
+          Int_t    iBin    = xaxis->FindBin(n);
+          Double_t binW    = hTime_front_map[i]->GetBinWidth(iBin);
+          Double_t iCenter = hTime_front_map[i]->GetBinCenter(iBin);
+          Double_t tDif    = n - iCenter;
+          Double_t t0      = tDif;
+          if(tDif>0){
+              iBin++; //start from the next bin, since this one will have 0 volts
+              t0 = binW - tDif; //conpensate for the shift
+          }else{
+              t0 = t0*(-1.0); //otherwise will get region where no pulse info
+          }
+
+          for(int j=iBin; j<160;++j){
+              //Double_t pulse_i = spline->Eval(1e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //positive pulse starts at 1ns
+              Double_t pulse_i = spline->Eval(10e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //negative pulse starts at 10ns
+              Double_t voltage = channelWF[i]->GetBinContent(j) + pulse_i;
+              channelWF[i]->SetBinContent(j,voltage);
+            }
+            cout<<n<<" ";
+        }
+        cout<<endl;
+        ++i;
+    }
+
   /// plotting
-    plotFrenzy();
+  plotFrenzy();
+  gimmeWF(maxCh);
 
 }
