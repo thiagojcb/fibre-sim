@@ -101,9 +101,9 @@ void gimmeWF(Int_t chid){
     cWF = new TCanvas;
     cWF->Divide(2,1);
     cWF->cd(1);
-    hTime_front_map[chid]->Draw();
+    hTime_front_map[chid].Draw();
     cWF->cd(2);
-    channelWF[chid]->Draw();
+    channelWF[chid].Draw();
 }
 
 void plotFrenzy(){
@@ -178,6 +178,7 @@ void ToyROSS(){
   
   for (int j=0; j<trials; ++j){ //randomization loop, for same event
       reset();
+      //cout<<"doing "<< j <<" trial"<<endl;
 
     for (int i = pastEvt; i<nEvt; ++i) {
       myTree->GetEntry(i);
@@ -233,26 +234,33 @@ void ToyROSS(){
         }
       }
     }//hits on a event loop
-
+    //cout<<"collected all hits"<<endl;
+    //Reconstruction of Z position
     Double_t recoPosZ = (first_hit_b-first_hit_f)/(2*timeFibre);
     gBF->AddPoint(hTime_total->Integral(),100*(recoPosZ - posZ));
     hRecoZ->Fill(100*(recoPosZ - posZ)); //in cm
 
+    //check how many entries the bin with max entries has
     hTime_Max_bin_cont->Fill(hTime_front->GetMaximum());
 
+    //cout<<"did recoZ"<<endl;
+
     //getting max amplitude in an event
-    channelWF       = new TH1F*[channelHits_front.size()];
-    hTime_front_map = new TH1D*[channelHits_front.size()];
+    //channelWF       = new TH1F*[channelHits_front.size()];
+    //hTime_front_map = new TH1D*[channelHits_front.size()];
     Int_t i=1;
 
     for (const auto& [key, value] : channelHits_front){
         //cout<<i<<" : "<<key<<" : ";
-        channelWF[i] = new TH1F(Form("h%d",key),Form("Fibre %d, front ch",key),160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
-        channelWF[i]->GetXaxis()->SetTitle("tick time (ns)");
-        channelWF[i]->GetYaxis()->SetTitle("Voltage (V)");
-        hTime_front_map[i] = new TH1D(Form("hTfm%d",key),Form("Fibre %d, front ch",key),160,0,100);
-        hTime_front_map[i]->GetXaxis()->SetTitle("Hit time (ns)");
-        hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
+        //channelWF[i] = new TH1F(Form("h%d",key),Form("Fibre %d, front ch",key),160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
+        TH1F htempF("","",160,0,100);
+        channelWF[i] = htempF;
+        //channelWF[i]->GetXaxis()->SetTitle("tick time (ns)");
+        //channelWF[i]->GetYaxis()->SetTitle("Voltage (V)");
+        //hTime_front_map[i] = new TH1D(Form("hTfm%d",key),Form("Fibre %d, front ch",key),160,0,100);
+        TH1D htempD("","",160,0,100);        //hTime_front_map[i]->GetXaxis()->SetTitle("Hit time (ns)");
+        hTime_front_map[i] = htempD;
+        //hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
 
         if(maxChC<value.size()){
             maxChC = value.size();
@@ -260,10 +268,10 @@ void ToyROSS(){
         }
 
         for (const auto& n : value){
-            hTime_front_map[i]->Fill(n);
+            hTime_front_map[i].Fill(n);
             Int_t    iBin    = xaxis->FindBin(n);
-            Double_t binW    = hTime_front_map[i]->GetBinWidth(iBin);
-            Double_t iCenter = hTime_front_map[i]->GetBinCenter(iBin);
+            Double_t binW    = hTime_front_map[i].GetBinWidth(iBin);
+            Double_t iCenter = hTime_front_map[i].GetBinCenter(iBin);
             Double_t tDif    = n - iCenter;
             Double_t t0      = tDif;
             if(tDif>0){
@@ -276,21 +284,26 @@ void ToyROSS(){
             for(int j=iBin; j<160;++j){
                 //Double_t pulse_i = spline->Eval(1e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //positive pulse starts at 1ns
                 Double_t pulse_i = spline->Eval(10e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //negative pulse starts at 10ns
-                Double_t voltage = channelWF[i]->GetBinContent(j) + pulse_i;
-                channelWF[i]->SetBinContent(j,voltage);
+                Double_t voltage = channelWF[i].GetBinContent(j) + pulse_i;
+                channelWF[i].SetBinContent(j,voltage);
             }
             //cout<<n<<" ";
           }
           //cout<<endl;
-          Double_t amp = channelWF[i]->GetMinimum();
-          if(amp<maxAmp)
+          Double_t amp = channelWF[i].GetMinimum();
+          if(amp<maxAmp) {
               maxAmp = amp; //negative pulse
+          }
+          //delete channelWF[i];
+          //delete hTime_front_map[i];
           ++i;
       }
+    //cout<<endl;
     hMaxAmp->Fill(maxAmp);
 
   }//rndm loop
-  cout<<"Max amp = "<<hMaxAmp->GetMean()<<" for "<< gBF->GetMean() <<"PE."<<endl;
+  cout<<"Max amp = "<<hMaxAmp->GetMean()<<"+/-"<<hMaxAmp->GetRMS()<<" V and "<< gBF->GetMean() <<"+/-";
+  cout<<gBF->GetRMS()<<" PE."<<endl;
 
   /// plotting
   //plotFrenzy();
