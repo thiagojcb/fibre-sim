@@ -263,6 +263,7 @@ void ToyROSS(){
         //hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
 
         if(maxChC<value.size()){
+	//if(value.size()==3){
             maxChC = value.size();
             maxCh = i;
         }
@@ -308,7 +309,7 @@ void ToyROSS(){
   /// plotting
   //plotFrenzy();
   new TCanvas();
-  hMaxAmp->Draw();
-  //gimmeWF(maxCh);
+  //hMaxAmp->Draw();
+  gimmeWF(maxCh);
 
 }

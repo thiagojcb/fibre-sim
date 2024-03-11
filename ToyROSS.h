@@ -1,6 +1,6 @@
 // Input constants
 
-Int_t     trials = 1000;
+Int_t     trials = 1;
 Int_t     mySeed = 0;
 TRandom3 *rand1;
 
