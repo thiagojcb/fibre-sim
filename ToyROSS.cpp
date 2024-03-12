@@ -306,10 +306,17 @@ void ToyROSS(){
   cout<<"Max amp = "<<hMaxAmp->GetMean()<<"+/-"<<hMaxAmp->GetRMS()<<" V and "<< gBF->GetMean() <<"+/-";
   cout<<gBF->GetRMS()<<" PE."<<endl;
 
+  const Int_t nq = 1;
+   Double_t xq[nq];  // position where to compute the quantiles in [0,1]
+   Double_t yq[nq];  // array to contain the quantiles
+   xq[0]=0.1;
+   hMaxAmp->GetQuantiles(nq,yq,xq);
+   cout<<yq[0]<<endl;
+  
   /// plotting
   //plotFrenzy();
   new TCanvas();
-  //hMaxAmp->Draw();
-  gimmeWF(maxCh);
+  hMaxAmp->Draw();
+  //gimmeWF(maxCh);
 
 }
