@@ -98,12 +98,30 @@ void reset(){
 }
 
 void gimmeWF(Int_t chid){
-    cWF = new TCanvas;
+  cWF = new TCanvas("cnew","",1200,600);
     cWF->Divide(2,1);
     cWF->cd(1);
     hTime_front_map[chid].Draw();
+    hTime_front_map[chid].SetLineWidth(3);
+    hTime_front_map[chid].GetXaxis()->SetTitle("Hit Time (ns)");
+    hTime_front_map[chid].GetYaxis()->SetTitle("Entries / 0.625 ns");
+    gPad->SetGridx();
+    gPad->SetGridy();
+    gPad->SetTickx();
+    gPad->SetTicky();
+
     cWF->cd(2);
     channelWF[chid].Draw();
+    channelWF[chid].SetLineWidth(3);
+    channelWF[chid].SetLineColor(kRed);
+    channelWF[chid].GetXaxis()->SetTitle("SAMPIC Sample (#times 0.625 ns)");
+    channelWF[chid].GetYaxis()->SetTitle("Voltage (V) / Sample");
+    channelWF[chid].GetYaxis()->SetTitleOffset(1.5);
+    channelWF[chid].SetStats(kFALSE);
+    gPad->SetGridx();
+    gPad->SetGridy();
+    gPad->SetTickx();
+    gPad->SetTicky();
 }
 
 void plotFrenzy(){
@@ -251,7 +269,7 @@ void ToyROSS(){
     Int_t i=1;
 
     for (const auto& [key, value] : channelHits_front){
-        //cout<<i<<" : "<<key<<" : ";
+      cout<<i<<" : "<<key<<" : "<< value.size()  << " :  ";
         //channelWF[i] = new TH1F(Form("h%d",key),Form("Fibre %d, front ch",key),160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
         TH1F htempF("","",160,0,100);
         channelWF[i] = htempF;
@@ -263,7 +281,7 @@ void ToyROSS(){
         //hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
 
         if(maxChC<value.size()){
-	//if(value.size()==3){
+	//if(value.size()==2){
             maxChC = value.size();
             maxCh = i;
         }
@@ -288,9 +306,9 @@ void ToyROSS(){
                 Double_t voltage = channelWF[i].GetBinContent(j) + pulse_i;
                 channelWF[i].SetBinContent(j,voltage);
             }
-            //cout<<n<<" ";
+            cout<<n<<" ";
           }
-          //cout<<endl;
+          cout<<endl;
           Double_t amp = channelWF[i].GetMinimum();
           if(amp<maxAmp) {
               maxAmp = amp; //negative pulse
@@ -299,7 +317,7 @@ void ToyROSS(){
           //delete hTime_front_map[i];
           ++i;
       }
-    //cout<<endl;
+    cout<<endl;
     hMaxAmp->Fill(maxAmp);
 
   }//rndm loop
@@ -315,8 +333,11 @@ void ToyROSS(){
   
   /// plotting
   //plotFrenzy();
-  new TCanvas();
-  hMaxAmp->Draw();
-  //gimmeWF(maxCh);
+
+   //new TCanvas();
+  //hMaxAmp->Draw();
+
+  gimmeWF(maxCh);
+  cout<<maxCh<<endl;
 
 }
