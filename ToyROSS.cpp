@@ -69,7 +69,8 @@ void initialize(){
 
     gBF = new TGraph();
 
-    channelWF_ref = new TH1F("channelWF_ref","channelWF_ref",160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
+    //channelWF_ref = new TH1F("channelWF_ref","channelWF_ref",160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
+    channelWF_ref = new TH1F("channelWF_ref","channelWF_ref",sampling_bins,0,100);
     xaxis = channelWF_ref->GetXaxis();
 
     cWF = new TCanvas;
@@ -269,9 +270,9 @@ void ToyROSS(){
     Int_t i=1;
 
     for (const auto& [key, value] : channelHits_front){
-      cout<<i<<" : "<<key<<" : "<< value.size()  << " :  ";
+      //cout<<i<<" : "<<key<<" : "<< value.size()  << " :  ";
         //channelWF[i] = new TH1F(Form("h%d",key),Form("Fibre %d, front ch",key),160,0,100);// SAMPIC bin size: 6.2500000e-10 ns (64 samples giving 40ns)
-        TH1F htempF("","",160,0,100);
+        TH1F htempF("","",sampling_bins,0,100);
         channelWF[i] = htempF;
         //channelWF[i]->GetXaxis()->SetTitle("tick time (ns)");
         //channelWF[i]->GetYaxis()->SetTitle("Voltage (V)");
@@ -280,8 +281,8 @@ void ToyROSS(){
         hTime_front_map[i] = htempD;
         //hTime_front_map[i]->GetYaxis()->SetTitle("Entries / 0.625 ns");
 
-        if(maxChC<value.size()){
-	//if(value.size()==2){
+        //if(maxChC<value.size()){
+	if(value.size()==2){
             maxChC = value.size();
             maxCh = i;
         }
@@ -289,8 +290,8 @@ void ToyROSS(){
         for (const auto& n : value){
             hTime_front_map[i].Fill(n);
             Int_t    iBin    = xaxis->FindBin(n);
-            Double_t binW    = hTime_front_map[i].GetBinWidth(iBin);
-            Double_t iCenter = hTime_front_map[i].GetBinCenter(iBin);
+            Double_t binW    = channelWF[i].GetBinWidth(iBin);
+            Double_t iCenter = channelWF[i].GetBinCenter(iBin);
             Double_t tDif    = n - iCenter;
             Double_t t0      = tDif;
             if(tDif>0){
@@ -300,15 +301,15 @@ void ToyROSS(){
                 t0 = t0*(-1.0); //otherwise will get region where no pulse info
             }
 
-            for(int j=iBin; j<160;++j){
+            for(int j=iBin; j<sampling_bins;++j){
                 //Double_t pulse_i = spline->Eval(1e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //positive pulse starts at 1ns
                 Double_t pulse_i = spline->Eval(10e-9 +(t0)*1e-9 + (j-iBin)*binW*1e-9); //negative pulse starts at 10ns
                 Double_t voltage = channelWF[i].GetBinContent(j) + pulse_i;
                 channelWF[i].SetBinContent(j,voltage);
             }
-            cout<<n<<" ";
+            //cout<<n<<" ";
           }
-          cout<<endl;
+	//cout<<endl;
           Double_t amp = channelWF[i].GetMinimum();
           if(amp<maxAmp) {
               maxAmp = amp; //negative pulse
@@ -317,7 +318,7 @@ void ToyROSS(){
           //delete hTime_front_map[i];
           ++i;
       }
-    cout<<endl;
+    //cout<<endl;
     hMaxAmp->Fill(maxAmp);
 
   }//rndm loop
