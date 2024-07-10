@@ -154,6 +154,9 @@ void plotFrenzy(){
     gPad->SetGridx();
     gPad->SetGridy();
 
+    cout<<"Bias Z: "<<hRecoZ->GetMean()<<endl;
+    cout<<"Res Z: "<<hRecoZ->GetRMS()<<endl;
+    
     new TCanvas();
     hTime_front_0->Draw();
     hTime_front_1->Draw("same");
@@ -216,14 +219,15 @@ void ToyROSS(){
           }
           Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
     	  Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS; //time spread, flat around average.
-          Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre; //total time, since G4 t0
+	  Double_t jitterT = rand1->Gaus(0.0,jitter);
+          Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre + jitterT; //total time, since G4 t0
     	  hTime_front_0->Fill(Time_ns);
           hTime_front_1->Fill(Time_ns + WLStime);
     	  hTime_front_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
           hTime_front->Fill(hitTime);
     	  hTime_total->Fill(hitTime);
     	  //cout<<fibreNumber<<endl;
-	      channelHits_front[fibreNumber].push_back(hitTime);
+	  channelHits_front[fibreNumber].push_back(hitTime);
 
     	  if(hitTime<first_hit_f){
     	    first_hit_f = hitTime;
@@ -238,8 +242,9 @@ void ToyROSS(){
 	    if(detected < totalEff/100.) {
             Double_t WLStime = rand1->Exp(fibre_dt); //decay time fibre
     	    Double_t spreadT = (rand1->Rndm() - 0.5 ) * distTravel * TTS;
-	        Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre;
-	        hTime_back_0->Fill(Time_ns);
+	    Double_t jitterT = rand1->Gaus(0.0,jitter);
+	    Double_t hitTime = Time_ns + WLStime + spreadT + distTravel * timeFibre + jitterT;
+	    hTime_back_0->Fill(Time_ns);
             hTime_back_1->Fill(Time_ns + WLStime);
             hTime_back_2->Fill(Time_ns + WLStime + distTravel * timeFibre + spreadT);
     	    hTime_back->Fill(hitTime);
@@ -333,12 +338,12 @@ void ToyROSS(){
    cout<<yq[0]<<endl;
   
   /// plotting
-  //plotFrenzy();
+  plotFrenzy();
 
    //new TCanvas();
   //hMaxAmp->Draw();
 
-  gimmeWF(maxCh);
-  cout<<maxCh<<endl;
+   //gimmeWF(maxCh);
+   //cout<<maxCh<<endl;
 
 }
